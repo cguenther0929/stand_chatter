@@ -1,4 +1,4 @@
-/******************************************************************************
+    /******************************************************************************
 *   FILE: main.c
 *
 *   PURPOSE: Main source
@@ -85,20 +85,8 @@ struct GlobalInformation gblinfo;
 
 void main()
 {
-    uint16_t i;
     SetUp();
     while (true) {
-        if(PB1 == 0){
-            TestCommutate();
-            tick100msDelay(10);
-        }
-        if(PB2 == 0) {
-            // TestTimer4();
-            OpenLoopStart();
-            // ClosedLoopRun();
-            
-            // tick100msDelay(10);
-        }
     }
 
 } //END Main()
@@ -108,48 +96,75 @@ void SetUp(void)
     /* PIN DIRECTIONS FOR ANALOG SELECT */
     TRISA5 = input;
     
-    /* PIN DIRECTION FOR LEDS */
-    TRISC3 = output;                    //Output for commutate LED
-    TRISC4 = output;                    //Health LED
-
-    TRISF7 = output;                    //Drives LED for A HI indicator
-    TRISG0 = output;                    //Drives LED for B HI indicator
-    TRISG1 = output;                    //Drives LED for C HI indicator
-    TRISG2 = output;                    //Drives LED for A LO indicator
-    TRISG3 = output;                    //Drives LED for B LO indicator
-    TRISG4 = output;                    //Drives LED for C LO indicator
-
-    /* PIN DIRECTION FOR MOTOR DRIVER */
-    TRISB0 = input;                     //Digital input for A phase crossed 
-    TRISB1 = input;                     //Digital input for B phase crossed
-    TRISB2 = input;                     //Digital input for C phase crossed
-    TRISC2 = output;                    //Motor PWM output
-
-    TRISE0 = output;                    // A HI Gate Driver control pin           
-    TRISE1 = output;                    // B HI Gate Driver control pin 
-    TRISE2 = output;                    // C HI Gate Driver control pin 
-    AHI_DRV = BHI_DRV = CHI_DRV = 0;    // For safety, turn these off now
-    
-    TRISE3 = output;                    // A LO Gate driver control pin
-    TRISE4 = output;                    // B LO Gate driver control pin
-    TRISE5 = output;                    // C LO Gate driver control pin
-    ALO_DRV = BLO_DRV = CLO_DRV = 0;    // For safety, turn these off now
+    /* PIN DIRECTION FOR LEDs */
+    TRISB5 = output;                    // Output for commutate LED
 
     /* PIN DIRECTION FOR PUSH BUTTONS */
-    TRISD0 = input;                     // Push Button 1 input
-    TRISD1 = input;                     // Push Button 2 input
-    TRISD2 = input;                     // Push Button 3 input   
+    TRISB0 = input;                     // Push Button 1 input
+    TRISB1 = input;                     // Push Button 2 input
+
+    /* PIN DIRECTION FOR RADIO MODULE SPI AND GPIO */
+    TRISD3 = output;                    // RFM Module reset signal
+    TRISD4 = output;                    // RFM Module SPI MOSI signal
+    TRISD5 = input;                     // RFM Module SPI MISO signal
+    TRISD6 = output;                    // RFM module SPI SCK signal
+    TRISD7 = output;                    // RFM module SPI #CS signal
     
-    /* INITIAL CONDITION OF COMMUTATE LEDS */
-    AHI_LED = ledoff;
-    BHI_LED = ledoff;
-    CHI_LED = ledoff;
-    ALO_LED = ledoff;
-    BLO_LED = ledoff;
-    CLO_LED = ledoff; 
+    TRISE2 = output;                    // RFM DIO5 signal
+    TRISE3 = output;                    // RFM DIO4 signal
+    TRISE4 = output;                    // RFM DIO3 signal
+    TRISE5 = output;                    // RFM DIO2 signal
+    TRISE6 = output;                    // RFM DIO1 signal
+    TRISE7 = output;                    // RFM DIO0 and IRQ signal
+
+    /* PIN DIRECTION FOR DISPLAY SPI AND GPIO */
+    TRISC0 = output;                    // Display data/command outputs
+    TRISC1 = output;                    // Display reset signal 
+    TRISC2 = output;                    // Display SPI chip select signal
+    TRISC3 = output;                    // Display SPI SCK signal
+    TRISC5 = output;                    // Display SPI MOSI signal
+
+    /* UNUSED PINS DEFINED AS OUTPUTS TO SAVE POWER */
+    TRISA1 = output;
+    TRISA3 = output;
+    TRISA4 = output;
+    TRISA5 = output;
+    
+    TRISB2 = output;
+    TRISB3 = output;
+    TRISB4 = output;
+    
+    TRISC4 = output;
+    TRISC6 = output;
+    TRISC7 = output;
+    
+    TRISG4 = output;
+    TRISG3 = output;
+    TRISG2 = output;
+    TRISG1 = output;
+    TRISG0 = output;
+
+    TRISF7 = output;
+    TRISF6 = output;
+    TRISF5 = output;
+    TRISF4 = output;
+    TRISF3 = output;
+    TRISF2 = output;
+    TRISF1 = output;
+    
+    TRISE1 = output;
+    TRISE0 = output;
+    
+    TRISD2 = output;
+    TRISD1 = output;
+    TRISD0 = output;
+
+    /* INITIAL CONDITION OF HEALTH LED */
+    HEALTH_LED = ledoff;
 
     Init_Interrupts();                  //Set up interrupts  
 
+    // TODO need to see how right or wrong this is
     AnalogRefSel(EXTREF, EXTREF);       //User internal 2.048V reference and External VREF pin for negative reference -- page 216/380
     InitA2D(1, 2, 32);                  //Set up AD (Justification, Acq Time (TAD), Prescaler) ==> (Right, 16 TAD, RC Oscillator) -- page 361/550
 
@@ -157,32 +172,13 @@ void SetUp(void)
     gblinfo.tick100ms = 0;      // Initialize 100s of a tick1000mond counter to 0
     gblinfo.tick1000ms = 0;     // Seconds counter
 
-    gblinfo.comu_state          = DRV_NONE;             //Initial motor driver state
-    gblinfo.motor_run_mode      = MOTOR_OFF;            //Initial motor run state
-    gblinfo.closed_loop_state   = CLOSED_LOOP_IDLE;     // Initial state for intermediate commutate state 
-    gblinfo.motor_rpm           = START_RPM;
-
-    /* DISABLE ANALOG CHANNELS */
+    /* SETUP ANALOG CHANNELS */
     ANCON0 = 0x00;          // Analog channels 7-0 are configured for digital inputs. p.363     
     ANCON1 = 0x00;          // Analog channel 10-8 are configred for digital inputs. p.364
-    EnableAnalogCh(4);      // Channel for current sense
+    EnableAnalogCh(BAT_VOLTAGE_CH);      // Channel for current sense
 
-    /* SETUP TIMER FOR PWM GENERATION */
-    PWM1Init(TIMER2);				            //Initialize PWM 1 -- ARGS: Timer to use (options are 2, 4, 6, 8 and 10)
-	PWM1EnableOuts('x');		                //ARGS: Output pin (ex 'a', 'b', 'c', or 'd').  'x' will leave the pin as digital I/O for now
-	Timer2Init(0,PWM_Timer_Prescaler,1);  		//Args: Interrupts, Prescaler, Postscaler
-	Timer2On(PWM_Timer_PR_Value);				//Args: Period register unsigned char
-
-    /* SETUP TIMER FOR OPEN LOOP STARTING */
-    Timer4Init(0,T4_prescaler,T4_postscaler);        //ARGS: No Interrupts; Prescaler of 16; Postscaler of 16
-    Timer4Off();
-    
-    /* SETUP TIMER FOR COMMUTATE POINTS */
-    Timer1Init(0,8,0);  // 0 = Do not cause interrupts, 8 = prescaler value (max value), 0 = clock source (set to internal Fosc/4)
-    Timer1Off();
-    
     /* TIMER FOR APPLICATION INTERRUPTS */
-    Timer0Init(1, 256, 0); //ARGS: interrupts = yes, prescaler = 256, clksource = FOSC/4
+    Timer0Init(1, 2, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
     Timer0On();             
 }
 
@@ -193,8 +189,7 @@ void tick100msDelay(uint16_t ticks)
     for (i = ticks; i > 0; i--)
     {
         tick = gblinfo.tick100ms;
-        while (tick == gblinfo.tick100ms)
-            ; //Wait for time to wrap around (in one half tick1000mond)
+        while (tick == gblinfo.tick100ms); //Wait for time to wrap around (in one half tick1000mond)
     }
 }
 

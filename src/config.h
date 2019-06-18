@@ -24,23 +24,23 @@
 #include <xc.h>
 
 /* PREPROCESSOR CALCULATION TO DETERMINE TIMER4'S INCREMENT RATE */
-#define MCU_OSC_FRQ                     32768000.0               //Oscillator used for MCU
-#define T4_prescaler                    16.0
-#define T4_postscaler                   16.0
-#define T4_FOSCBY4                      (MCU_OSC_FRQ/4.0)
-#define T4_SCALER                       (T4_prescaler*T4_postscaler)
-#define T4_INC_RATE                     (T4_FOSCBY4/T4_SCALER)
+#define MCU_OSC_FRQ         16000000.0                  // Oscillator used for MCU
+#define OSC_DIV4            (MCU_OSC_FRQ/4.0)           // Oscillator used for MCU
 
-/* PREPROCESSOR CALCULATION FOR MOTOR RPM CALCULATIONS 
-    To determine the necessary number of timer ticks between commutation switches 
-    we use the following equation  Timer Counts = TIMER MAX REG - [(60 * Timer Increment Rate / INTS_PER_REV) * ( 1 / Motor RPM)]
-*/
-#define MOTOR_POLES                     12
-#define POLE_PAIRS                      (MOTOR_POLES/2)
-#define INTS_PER_REV                    (6*POLE_PAIRS)
-#define TICKS_SCALER                    ((60.0*T4_INC_RATE)/INTS_PER_REV)   //Pre-processor calculation for determineing oscillator ticks
 
-#define MIN_CTR_TICKS                   50                            // Counter value must be at least this high before we start looking for XOVRS
+
+/* REGISTER VALUES FOR 10MS TIME BASE */         
+#define TMR0_INTUP_SETTING  1                                                           // 1 = Caused interrupts, 0 = do not cause interrupts
+#define TMR0_PRESCALER      2.0                                                         // Options are 1, 2, 4, 8, 16, 32, 128, or 256
+#define TMR0_INC_FREQ       (OSC_DIV4/TMR0_PRESCALER)                                   // Effective rate at which the timer increments
+#define HEART_BEAT_MS       100.0                                                       // Interrupt at this periodicity (mili-seconds)
+#define TMR0_TICKS          ((HEART_BEAT_MS/1000.0)*TMR0_INC_FREQ)                      // How many timer ticks between interrupts
+#define TMR0HIGH            (uint8_t)((65535-TMR0_TICKS)/256)                           // Value to be loaded into the 8-bit register
+#define TMR0LOW             (uint8_t)(TMR0_TICKS-(256*(uint8_t)(TMR0_TICKS/256))        // Module implementation to obtain register low value
+
+/* REGISTER VALUES FOR 100MS TIME BASE */    //TODO can probably remove
+// #define TMR0HIGH            255         //16MHz IN OSC w/ prescaler of 2 and a period of 100ms
+// #define TMR0LOW             55        
 
 /* DEFINE CODE VERSION NUMBER */
 #define MAJVER              0x00
@@ -48,42 +48,17 @@
 #define BUGVER              0x01
 
 /* DEFINES FOR MC PINS */
-#define APH_CROSSED         PORTBbits.RB0           // Digital input indicating A phase crossed
-#define BPH_CROSSED         PORTBbits.RB1           // Digital input indicating B phase crossed
-#define CPH_CROSSED         PORTBbits.RB2           // Digital input indicating C phase crossed
-
-#define MOT_PWM             LATCbits.LATC2          // Motor PWM
-#define PWM_STATE           PORTCbits.RC2           // Read port pin to determine if output is high or low
-
-#define AHI_DRV             LATEbits.LATE0          // Control inputs for high-side/low-side drivers
-#define BHI_DRV             LATEbits.LATE1
-#define CHI_DRV             LATEbits.LATE2
-#define ALO_DRV             LATEbits.LATE3
-#define BLO_DRV             LATEbits.LATE4
-#define CLO_DRV             LATEbits.LATE5
 
 /* DEFINES FOR LED PINS */
-#define COMU_LED            LATCbits.LATC4          //For driving the commutate LED
-#define HEALTH_LED          LATCbits.LATC3          //For driving health LED
-
-#define AHI_LED             LATFbits.LATF7          //Pins for driving commutate state indicators             
-#define BHI_LED             LATGbits.LATG0
-#define CHI_LED             LATGbits.LATG1
-#define ALO_LED             LATGbits.LATG2
-#define BLO_LED             LATGbits.LATG3
-#define CLO_LED             LATGbits.LATG4
+#define HEALTH_LED          LATBbits.LATB5          // For driving health LED  
 
 /* DEFINES FOR PUSH BUTTONS */
-#define PB1                 PORTDbits.RD0            //Inputs from buttons
-#define PB2                 PORTDbits.RD1
-#define PB3                 PORTDbits.RD2
+#define PB1                 PORTBbits.RB0           // Inputs from buttons
+#define PB2                 PORTBbits.RB1
 
 /* DEFINES FOR ANALOG SENSE */
-#define MOT_CURRENT         4           //Analog channel for reading motor current
+#define BAT_VOLTAGE_CH      0           // Analog channel for reading battery voltage
 
-/* REGISTER VALUES FOR 10MS TIME BASE */         
-#define TMR0HIGH            254         //32.768MHz with 256 prescaler and an interrupt every 10ms // 7.3728MHz with 16 prescaler at 10ms until the 32.768MHz oscillator shows up
-#define TMR0LOW             191        
 
 
 /* DEFINE VARIOUS PIN FUNCITONS */
@@ -101,39 +76,6 @@
 #define TIMER8              8
 #define TIMER9              9   
 #define TIMER10             10
-
-// #define MtrTmrInit          Timer1Init
-// #define MtrTmrOff           Timer1Off
-// #define MtrTmrOn            Timer1On
-
-/* MOTOR COMMUTATE STATES */
-#define DRV_NONE            0
-#define DRV_B2A             1
-#define DRV_C2A             2
-#define DRV_C2B             3
-#define DRV_A2B             4
-#define DRV_A2C             5
-#define DRV_B2C             6
-
-/* INTERMEDIATE COMMUTATE STATE */
-#define CLOSED_LOOP_IDLE    1           // Closed loop has not been enabled 
-#define JUST_SWITCHED       2           // A commutation switch just happened, and we're not looking for XOVER yet
-#define LOOKING_FOR_XOVER   3           // Looking for XOVER, application should be very time sensitive
-#define WAITING_FOR_SW      4           // XOVER detected, now counting 2x timer value for commutation switch
-
-/* MOTOR RUN MODE */
-#define MOTOR_OFF           1
-#define OPEN_LOOP_START     2
-#define NORMAL_RUN          3
-
-/* VARIOUS MOTOR PARAMETERS */
-#define OL_RAMP_RATE        20          // Increase the RPM value by this much every 500us 
-#define OL_MAX_RPM          1200        // When this RPM value is achieved in OL start, transition to closed-loop run
-#define START_RPM           180         // Starting RPM.  Number really needs to be larger than 180.  
-#define START_DUTY          10          // Duty cycle percent for when starting motor
-#define TARGET_XOVR_PRCNT   24         // Scaler divisor is divided by 16, so take desires scaler and multiple by 16.  For example 1.5x would be 192
-#define POLARITY_LOW        0           // Intelligent name for defining whether or not the crossover polarity is low or high
-#define POLARITY_HIGH       1           // Intelligent name for defining whether or not the crossover polarity is low or high
 
 /* LED CONTROL */
 #define ledon               0
