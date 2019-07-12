@@ -93,26 +93,48 @@ __interrupt (low_priority) void main_isr( void ) {
         TMR0H = TMR0HIGH;                        //Load the high register for the timer -- looking for 1/100 of a tick1000ms
         TMR0L = TMR0LOW;                        //Load the low register for the timer
         
-        Events10ms();
+        gblinfo.flag100ms = true;
         
-        if(gblinfo.tick10ms >= 9) {
-            gblinfo.tick10ms = 0;               //Reset centi-tick1000monds
-            Events100ms();
-            if(gblinfo.tick100ms >= 9) {         //Once Second Reached
-                gblinfo.tick100ms = 0;           //Reset 100 milliseconds ounter
-                Events1000ms();                 //Look at events that are to happen every 1s
+        if(gblinfo.tick100ms >= 4) {
+            gblinfo.tick100ms = 0;               //Reset 100ms counter 
+            gblinfo.flag500ms = true;
+            
+            if(gblinfo.tick500ms >= 1) {         //Once Second Reached
+                gblinfo.tick500ms = 0;           //Reset 500ms counter
+                gblinfo.flag1000ms = true;
+                
                 if(gblinfo.tick1000ms >= 59)                     //We've ticked away one minute, so reset
                     gblinfo.tick1000ms = 0;                      //Reset seconds counter
                 else
                     gblinfo.tick1000ms += 1;                     //Increment seconds counter
             }
+            
             else {
-                 gblinfo.tick100ms += 1;                         //Increment 100 millisecond timer 
+                 gblinfo.tick500ms += 1;                         //Increment 100 millisecond timer 
             }
         }
         else {
-            gblinfo.tick10ms += 1;                               //Increment 1 millisecond timer
+            gblinfo.tick100ms += 1;                               //Increment 1 millisecond timer
         }
+        
+        // if(gblinfo.tick10ms >= 9) {
+        //     gblinfo.tick10ms = 0;               //Reset centi-tick1000monds
+        //     Events100ms();
+        //     if(gblinfo.tick100ms >= 9) {         //Once Second Reached
+        //         gblinfo.tick100ms = 0;           //Reset 100 milliseconds ounter
+        //         Events1000ms();                 //Look at events that are to happen every 1s
+        //         if(gblinfo.tick1000ms >= 59)                     //We've ticked away one minute, so reset
+        //             gblinfo.tick1000ms = 0;                      //Reset seconds counter
+        //         else
+        //             gblinfo.tick1000ms += 1;                     //Increment seconds counter
+        //     }
+        //     else {
+        //          gblinfo.tick100ms += 1;                         //Increment 100 millisecond timer 
+        //     }
+        // }
+        // else {
+        //     gblinfo.tick10ms += 1;                               //Increment 1 millisecond timer
+        // }
 
         TMR0IF = 0;                         //Software is responsible for clearing this flag
     }   /* END IF FOR TMR1IF */
@@ -139,10 +161,14 @@ __interrupt (low_priority) void main_isr( void ) {
     
 } /* END void interrupt low_priority main_isr( void ) */
 
-void Events10ms(void) {                  //Keep routine slim!
+void Events10ms(void) {                 
 }
 
-void Events100ms(void) {                //Keep routine slim!
+void Events100ms(void) {                
+    
+}
+
+void Events500ms(void) {                
     
 }
 

@@ -3,8 +3,8 @@ src/stdbool.h
 src/stdint.h
 src/pic18f66k22.h
 
-Stand_Chatter.X/funclist
-Stand_Chatter.X/l.obj
-Stand_Chatter.X/build
-Stand_Chatter.X/dist
-Stand_Chatter.X/nbproject/*
+STAND_CHATTER.X/funclist
+STAND_CHATTER.X/l.obj
+STAND_CHATTER.X/build
+STAND_CHATTER.X/dist
+STAND_CHATTER.X/nbproject/*

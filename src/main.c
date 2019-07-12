@@ -87,6 +87,19 @@ void main()
 {
     SetUp();
     while (true) {
+        if(gblinfo.flag100ms) {
+            gblinfo.flag10ms = false;
+            Events100ms();
+        }
+        if(gblinfo.flag500ms) {
+            gblinfo.flag100ms = false;
+            Events500ms();
+        }
+        if(gblinfo.flag1000ms) {
+            gblinfo.flag1000ms = false;
+            Events1000ms();
+
+        }
     }
 
 } //END Main()
@@ -97,7 +110,7 @@ void SetUp(void)
     TRISA5 = input;
     
     /* PIN DIRECTION FOR LEDs */
-    TRISB5 = output;                    // Output for commutate LED
+    TRISB5 = output;                    // Output for system health LED.  
 
     /* PIN DIRECTION FOR PUSH BUTTONS */
     TRISB0 = input;                     // Push Button 1 input
@@ -165,20 +178,21 @@ void SetUp(void)
     Init_Interrupts();                  //Set up interrupts  
 
     // TODO need to see how right or wrong this is
-    AnalogRefSel(EXTREF, EXTREF);       //User internal 2.048V reference and External VREF pin for negative reference -- page 216/380
-    InitA2D(1, 2, 32);                  //Set up AD (Justification, Acq Time (TAD), Prescaler) ==> (Right, 16 TAD, RC Oscillator) -- page 361/550
+    //AnalogRefSel(EXTREF, EXTREF);       //Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
+    //InitA2D(1, 2, 32);                  //Set up AD (Justification, Acq Time (TAD), Prescaler) ==> (Right, 16 TAD, RC Oscillator) -- page 361/550
 
     gblinfo.tick10ms = 0;       // Initialize 100s of a tick1000mond counter to 0
     gblinfo.tick100ms = 0;      // Initialize 100s of a tick1000mond counter to 0
+    gblinfo.tick500ms = 0;      // Initialize 100s of a tick1000mond counter to 0
     gblinfo.tick1000ms = 0;     // Seconds counter
 
-    /* SETUP ANALOG CHANNELS */
+    /* SETUP ANALOG CHANNELS */  //TODO need to add necessary lines back in for reading battery voltage.
     ANCON0 = 0x00;          // Analog channels 7-0 are configured for digital inputs. p.363     
     ANCON1 = 0x00;          // Analog channel 10-8 are configred for digital inputs. p.364
-    EnableAnalogCh(BAT_VOLTAGE_CH);      // Channel for current sense
+    // EnableAnalogCh(BAT_VOLTAGE_CH);      // Channel for current sense
 
     /* TIMER FOR APPLICATION INTERRUPTS */
-    Timer0Init(1, 2, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
+    Timer0Init(TMR0_INTUP_SETTING, TMR0_PRESCALER, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
     Timer0On();             
 }
 
@@ -193,14 +207,15 @@ void tick100msDelay(uint16_t ticks)
     }
 }
 
-void tick10msDelay(uint16_t ticks)
-{
-    uint16_t i = 0;
-    uint16_t tick = 0; //Used to lock time value
-    for (i = ticks; i > 0; i--)
-    {
-        tick = gblinfo.tick10ms;
-        while (tick == gblinfo.tick10ms); //Wait for time to wrap around (in one half tick1000mond)
-    }
-}
+// TODO we might want to remove as this function is not support on the stand chatter app.  
+// void tick10msDelay(uint16_t ticks)  
+// {
+//     uint16_t i = 0;
+//     uint16_t tick = 0; //Used to lock time value
+//     for (i = ticks; i > 0; i--)
+//     {
+//         tick = gblinfo.tick10ms;
+//         while (tick == gblinfo.tick10ms); //Wait for time to wrap around (in one half tick1000mond)
+//     }
+// }
 /* END OF FILE */

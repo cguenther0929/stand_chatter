@@ -21,13 +21,13 @@
 struct GlobalInformation gblinfo;
 
 void Timer0On( void ){
-    #ifndef TMR0HIGH                    //Assume TMR0LOW is also not defined
-        TMR0H = 254;                   //Load the high register for the timer (16MHz and prescaler of 64)
-        TMR0L = 191;                   	//Load the low register for the timer   (16MHz and prescaler of 64)
-    #else
-        TMR0H = TMR0HIGH;                   	//Load the high register for the timer (16MHz and prescaler of 64)
-        TMR0L = TMR0LOW;                   	//Load the low register for the timer   (16MHz and prescaler of 64)
-    #endif
+    // #ifndef TMR0HIGH                    //Assume TMR0LOW is also not defined
+    //     TMR0H = 254;                   //Load the high register for the timer (16MHz and prescaler of 64)
+    //     TMR0L = 191;                   	//Load the low register for the timer   (16MHz and prescaler of 64)
+    // #else
+    TMR0H = TMR0HIGH;                   	//Load the high register for the timer (16MHz and prescaler of 64)
+    TMR0L = TMR0LOW;                   	//Load the low register for the timer   (16MHz and prescaler of 64)
+    // #endif
     TMR0ON = 1;                 	//Set the bit to turn on the timer
 }
 

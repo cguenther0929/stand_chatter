@@ -78,8 +78,9 @@ void EnableInterrupts( void );
 
 /********************************************************
 *FUNCTION: void Events10ms(void)
-*PURPOSE: Runs on a 1 millisecond interrupt boundary.  
-*       This routine shall be kept slim!
+*PURPOSE: Runs on a 10 mili-second periodicity  
+*       This routine is called from the main loop when
+*       the 10ms flag is set in the ISR.  
 *PRECONDITION: Interrupts and time base should be setup
 *POSTCONDITION: Action taken on a 1ms boundary
 *RETURN: Nothing
@@ -88,13 +89,25 @@ void Events10ms(void);
 
 /********************************************************
 *FUNCTION: void Events100ms(void)
-*PURPOSE: Runs on a 100 millisecond interrupt boundary.  
-*       This routine shall be kept slim!
+*PURPOSE: Runs on a 100 milli-second periodicity 
+*       This routine is called from the main loop when
+*       the 100ms flag is set in the ISR.  
 *PRECONDITION: Interrupts and time base should be setup
 *POSTCONDITION: Action taken on a 100ms boundary
 *RETURN: Nothing
 ********************************************************/
 void Events100ms(void); 
+
+/********************************************************
+*FUNCTION: void Events500ms(void)
+*PURPOSE: Runs on a 500 milli-second periodicity  
+*       This routine is called from the main loop when
+*       the 500ms flag is set in the ISR.  
+*PRECONDITION: Interrupts and time base should be setup
+*POSTCONDITION: Action taken on a 500ms periodicity
+*RETURN: Nothing
+********************************************************/
+void Events500ms(void);
 
 /********************************************************
 *FUNCTION: void Events1000ms(void)

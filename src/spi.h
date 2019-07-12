@@ -32,13 +32,13 @@
 
 
 /********************************************************
-*FUNCTION: void SPIInit( void )
+*FUNCTION: void SPI1Init( void )
 *PURPOSE: Initialize the SPI module
 *PRECONDITION: SPI module not initialized
 *POSTCONDITION: SPI module is now initialized
 *RETURN: Nothing
 ********************************************************/
-void SPIInit( void );
+void SPI1Init( void );
 
 /********************************************************
 *FUNCTION: void SPIWrite(UCHAR inst, UCHAR addr, UCHAR data)
@@ -58,60 +58,6 @@ void SPIWrite(UCHAR inst, UCHAR addr, UCHAR data);
 *RETURN: Nothing
 ********************************************************/
 UCHAR SPIRead(UCHAR inst, UCHAR addr);
-
-/********************************************************
-*FUNCTION: UCHAR PromStatus( void )
-*PURPOSE: To read the status from the EEPROM status register
-*PRECONDITION: None
-*POSTCONDITION: Status of EEPROM is now known
-*RETURN: Prom Status BYTE
-********************************************************/
-UCHAR PromStatus( void );
-
-/********************************************************
-*FUNCTION: void PromOn( void )
-*PURPOSE: To apply power to the EEPROM
-*PRECONDITION: EERPOM does not have power applied
-*POSTCONDITION: EEPROM now has power applied
-*RETURN: Nothing
-********************************************************/
-void PromOn( void );
-
-/********************************************************
-*FUNCTION: PromOff( void )
-*PURPOSE: To removed power from the EEPROM
-*PRECONDITION: EEPROM is powered on
-*POSTCONDITION: EEPROM is powered off to save power
-*RETURN: Nothing
-********************************************************/
-void PromOff( void );
-
-/********************************************************
-*FUNCTION: void EnableWrite( void )
-*PURPOSE: Remove the write protection on the EEPROM
-*PRECONDITION: User cannot write to the EEPROM
-*POSTCONDITION: User can now write to the EEPROM
-*RETURN: Nothing
-********************************************************/
-void EnableWrite( void );
-
-/********************************************************
-*FUNCTION: void WritePromStatus(UCHAR inst, UCHAR data)
-*PURPOSE: To allow user to write to the EEPROM status register
-*PRECONDITION: None
-*POSTCONDITION: "data" now written to EEPROM status register
-*RETURN: Nothing
-********************************************************/
-void WritePromStatus(UCHAR inst, UCHAR data);
-
-/********************************************************
-*FUNCTION: void DisableWrite( void )
-*PURPOSE: To removed write access to the EEPROM
-*PRECONDITION: User might be able to write to the EEPROM
-*POSTCONDITION: User can no longer write to the EEPROM
-*RETURN: Nothing
-********************************************************/
-void DisableWrite( void );
 
 /********************************************************
 *FUNCTION: void SPIBurnDelay(void)

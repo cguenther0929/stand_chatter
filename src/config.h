@@ -29,12 +29,12 @@
 
 /* REGISTER VALUES FOR 10MS TIME BASE */         
 #define TMR0_INTUP_SETTING  1                                                           // 1 = Caused interrupts, 0 = do not cause interrupts
-#define TMR0_PRESCALER      2.0                                                         // Options are 1, 2, 4, 8, 16, 32, 128, or 256
+#define TMR0_PRESCALER      2                                                           // Options are 1, 2, 4, 8, 16, 32, 128, or 256
 #define TMR0_INC_FREQ       (OSC_DIV4/TMR0_PRESCALER)                                   // Effective rate at which the timer increments
 #define HEART_BEAT_MS       100.0                                                       // Interrupt at this periodicity (mili-seconds)
 #define TMR0_TICKS          ((HEART_BEAT_MS/1000.0)*TMR0_INC_FREQ)                      // How many timer ticks between interrupts
 #define TMR0HIGH            (uint8_t)((65535-TMR0_TICKS)/256)                           // Value to be loaded into the 8-bit register
-#define TMR0LOW             (uint8_t)(TMR0_TICKS-(256*(uint8_t)(TMR0_TICKS/256))        // Module implementation to obtain register low value
+#define TMR0LOW             (uint8_t)(TMR0_TICKS-(256*(uint8_t)(TMR0_TICKS/256)))        // Module implementation to obtain register low value
 
 /* REGISTER VALUES FOR 100MS TIME BASE */    //TODO can probably remove this
 // #define TMR0HIGH            255         //16MHz IN OSC w/ prescaler of 2 and a period of 100ms

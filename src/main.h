@@ -25,7 +25,7 @@
 #include "isr.h"
 #include "config.h"     //Project specific header file
 #include "timer.h"
-#include "adc.h"
+//#include "adc.h"
 
 
 /********************************************************

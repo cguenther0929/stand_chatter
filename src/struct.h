@@ -26,7 +26,12 @@ extern struct GlobalInformation         //  Structure to pass information that i
 {
     uint16_t    tick10ms;               // Increases every 50mili tick1000monds 
     uint16_t    tick100ms;              // Used to keep track of passing deci-tick1000monds
+    uint16_t    tick500ms;              // Used to keep track of passing deci-tick1000monds
     uint16_t    tick1000ms;             // Use this to tick tick1000monds -- might not be used for audio interface board
+    bool        flag10ms;               // Set every 10ms -- not supported in this application
+    bool        flag100ms;              // Set every 100ms
+    bool        flag500ms;              // Set every 500ms
+    bool        flag1000ms;             // Set every 1000ms
 
 } GlobalInformation;
 
