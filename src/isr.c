@@ -173,7 +173,7 @@ void Events500ms(void) {
 }
 
 void Events1000ms(void) {
-    HEALTH_LED = ~HEALTH_LED;
+    health_led = ~health_led;
 }
 
 

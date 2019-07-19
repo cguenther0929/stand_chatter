@@ -37,6 +37,9 @@ typedef enum RFM69_FREQ {
     RF69_915MHZ
 } RFM69_FREQ;
 
+// These are just notes
+// To access the RFM, the first byte is the address byte (R/W + 7 address bits)
+// Where R/W = 1 for write and R/W = 0 for read
 
 /* TODO WHAT IS THIS AND DO WE NEED IT */
 #define null                    0

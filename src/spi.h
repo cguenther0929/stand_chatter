@@ -16,17 +16,25 @@
 #ifndef _H_SPI_H
 #define _H_SPI_H
 
-#include "type.h"
-#include "htc.h"
+// #include "htc.h"
+#include <xc.h>         //Part specific header file
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include "struct.h"
+#include "isr.h"
+#include "config.h"     //Project specific header file
+#include "timer.h"
 #include "config.h"
+#include "rfm69.h"
 
 /* DEFINE THE EEPROM INSTRUCTIONS */
-#define promread        0x03            //Clock this in to read the chip
-#define promwrite       0x02            //Clock this in to write
-#define disablewrite    0x04            //Disable write operations
-#define enablewrite     0x06            //Enable write operations
-#define statusreg       0x05            //Instruction to read status reg
-#define statuswrite     0x01            //Instruction to write status reg
+// #define promread        0x03            //Clock this in to read the chip
+// #define promwrite       0x02            //Clock this in to write
+// #define disablewrite    0x04            //Disable write operations
+// #define enablewrite     0x06            //Enable write operations
+// #define statusreg       0x05            //Instruction to read status reg
+// #define statuswrite     0x01            //Instruction to write status reg
 
 #define spidelay        50             //Define a small delay
 
@@ -41,23 +49,25 @@
 void SPI1Init( void );
 
 /********************************************************
-*FUNCTION: void SPIWrite(UCHAR inst, UCHAR addr, UCHAR data)
+*FUNCTION: void SPI1Write(uint8_t addr, uint8_t data)
 *PURPOSE: To write data out the SPI port
 *PRECONDITION: None
 *POSTCONDITION: Data is sent out the SPI port
 *RETURN: Nothing
 ********************************************************/
-void SPIWrite(UCHAR inst, UCHAR addr, UCHAR data);
+void SPI1Write(uint8_t addr, uint8_t data);
+
+
+void DispSPI1Write(uint8_t data);        //TODO need to comment
 
 /********************************************************
-*FUNCTION: UCHAR SPIRead(UCHAR inst, UCHAR addr)
-*PURPOSE: To perform a sequential read of the EEPROM
-        EEPROM only seems to work if you perform a sequential read
+*FUNCTION: uint8_t SPI1Read(uint8_t addr)
+*PURPOSE: Read a byte of data
 *PRECONDITION: None
-*POSTCONDITION: Data is read from the EEPROM
+*POSTCONDITION: One byte of data read over SPI interface
 *RETURN: Nothing
 ********************************************************/
-UCHAR SPIRead(UCHAR inst, UCHAR addr);
+uint8_t SPI1Read(uint8_t addr);
 
 /********************************************************
 *FUNCTION: void SPIBurnDelay(void)

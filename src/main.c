@@ -24,7 +24,7 @@
 #pragma config XINST = OFF      // Extended Instruction Set (Disabled)
 
 // CONFIG1H
-#pragma config FOSC = EC3       // TODO Update this description Oscillator (Internal RC oscillator) with output on OSC2.  p45/550.  default IRCF<2:0> = 110 = 8MHz (on pin 8MHz/4 = 2MHz)
+#pragma config FOSC = INTIO1    // Internal RC Oscillator with output on OSC2.  p45/550.
 #pragma config PLLCFG = OFF     // PLL x4 Enable bit (Disabled)
 #pragma config FCMEN = OFF      // Fail-Safe Clock Monitor (Disabled)
 #pragma config IESO = OFF       // Internal External Oscillator Switch Over Mode (Disabled)
@@ -85,7 +85,11 @@ struct GlobalInformation gblinfo;
 
 void main()
 {
+    uint8_t test_data;
     SetUp();
+    //test_data = SPI1Read(REG_RSSITHRESH);
+    // DisplayOn();
+
     while (true) {
         if(gblinfo.flag100ms) {
             gblinfo.flag10ms = false;
@@ -131,6 +135,7 @@ void SetUp(void)
     TRISE7 = output;                    // RFM DIO0 and IRQ signal
 
     /* PIN DIRECTION FOR DISPLAY SPI AND GPIO */
+    TRISB4 = output;                    // Active low output enables display
     TRISC0 = output;                    // Display data/command outputs
     TRISC1 = output;                    // Display reset signal 
     TRISC2 = output;                    // Display SPI chip select signal
@@ -145,7 +150,6 @@ void SetUp(void)
     
     TRISB2 = output;
     TRISB3 = output;
-    TRISB4 = output;
     
     TRISC4 = output;
     TRISC6 = output;
@@ -173,7 +177,10 @@ void SetUp(void)
     TRISD0 = output;
 
     /* INITIAL CONDITION OF HEALTH LED */
-    HEALTH_LED = ledoff;
+    health_led = LED_OFF;
+
+    /* TURN OFF THE DISPLAY */
+    disp_enable = DISPLAY_OFF;
 
     Init_Interrupts();                  //Set up interrupts  
 

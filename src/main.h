@@ -25,6 +25,8 @@
 #include "isr.h"
 #include "config.h"     //Project specific header file
 #include "timer.h"
+#include "spi.h"
+#include "disp.h"
 //#include "adc.h"
 
 
