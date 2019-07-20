@@ -87,11 +87,25 @@ void main()
 {
     uint8_t test_data;
     uint8_t i;
+    float battery_voltage;
+    
     SetUp();
     tick100msDelay(5);
     //test_data = SPI1Read(REG_RSSITHRESH);
     DispInit();
+    battery_voltage = GetBatteryVoltage();
 
+    DispSetContract(60);
+    DispWriteString("Battery Voltage");
+    DispLineTwo();
+    DispWriteFloat(battery_voltage);
+
+    tick100msDelay(35);
+    DispSetContract(1);
+
+    DispClear();
+    DispCursorHome();
+    tick100msDelay(1);
     /*TODO the following is just for debug*/
 
     // DispWriteString("HELLO SALTY");
@@ -158,21 +172,21 @@ void main()
     tick100msDelay(30);
     disp_enable = DISPLAY_OFF;
     /* TODO end of debug code */
-
     
     while (true) {
         if(gblinfo.flag100ms) {
             gblinfo.flag10ms = false;
             Events100ms();
         }
+
         if(gblinfo.flag500ms) {
             gblinfo.flag100ms = false;
             Events500ms();
         }
+
         if(gblinfo.flag1000ms) {
             gblinfo.flag1000ms = false;
             Events1000ms();
-
         }
     }
 
@@ -258,18 +272,18 @@ void SetUp(void)
     SPI1Init();
 
     // TODO need to see how right or wrong this is
-    //AnalogRefSel(EXTREF, EXTREF);       //Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
-    //InitA2D(1, 2, 32);                  //Set up AD (Justification, Acq Time (TAD), Prescaler) ==> (Right, 16 TAD, RC Oscillator) -- page 361/550
-
-    gblinfo.tick10ms = 0;       // Initialize 10ms tick coutner
-    gblinfo.tick100ms = 0;      // Initialize 100ms tick coutner
-    gblinfo.tick500ms = 0;      // Initialize 500ms tick coutner
-    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick coutner
+    AnalogRefSel(REF2D048, EXTREF);       // Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
+    InitA2D(RIGHT_JUSTIFIED, 4);                      // Set up AD (Justification, Acq Time TADs) ==> (Right, 4 TAD) -- page 361/550
 
     /* SETUP ANALOG CHANNELS */  //TODO need to add necessary lines back in for reading battery voltage.
     ANCON0 = 0x00;          // Analog channels 7-0 are configured for digital inputs. p.363     
     ANCON1 = 0x00;          // Analog channel 10-8 are configred for digital inputs. p.364
-    // EnableAnalogCh(BAT_VOLTAGE_CH);      // Channel for current sense
+    EnableAnalogCh(BAT_VOLTAGE_CH);      // TODO NEED TO ADD THIS LINE IN __Channel for current sense
+    
+    gblinfo.tick10ms = 0;       // Initialize 10ms tick coutner
+    gblinfo.tick100ms = 0;      // Initialize 100ms tick coutner
+    gblinfo.tick500ms = 0;      // Initialize 500ms tick coutner
+    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick coutner
 
     /* TIMER FOR APPLICATION INTERRUPTS */
     Timer0Init(TMR0_INTUP_SETTING, TMR0_PRESCALER, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
@@ -287,6 +301,14 @@ void tick100msDelay(uint16_t ticks)
     }
 }
 
+float GetBatteryVoltage ( void ) {
+    float battery_voltage;
+    battery_voltage = ReadA2D(BAT_VOLTAGE_CH,1);
+    battery_voltage = battery_voltage * (2.048/4096);
+    battery_voltage *= 1.6667;                          // Convert to account for resistor divider
+    
+    return (battery_voltage);
+}
 // TODO we might want to remove as this function is not support on the stand chatter app.  
 // void tick10msDelay(uint16_t ticks)  
 // {

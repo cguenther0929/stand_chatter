@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "struct.h"
 #include "config.h"     //Project specific header file
 #include "config.h"
@@ -47,6 +48,6 @@ void DispLineTwo (void );
 
 void DispSetContract(uint8_t percentage);
 
-
+void DispWriteFloat (float number);
 #endif
 /* END OF FILE */

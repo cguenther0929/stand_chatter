@@ -121,4 +121,18 @@ void DispWriteString(const char * y) {
 
 }
 
+void DispWriteFloat (float number) {
+    char temphex[8];        //Define the array that will hold the ASCII values
+    uint8_t i;                //Use this as a counter
+    uint16_t j;
+    uint8_t decimal_count; //This is how many digits are written
+
+    /* USE SPRINT F TO BUILD THE ARRAY OF ASCII CHARACTERS */
+    decimal_count = sprintf(temphex, "%.4f", number);   //f tells the function we want to print a float value
+
+    for(i = 0; i < decimal_count; i++) {    //Print out the array of ASCII characters.
+        DispWriteChar(temphex[i]);
+    }
+}
+
 /* END OF FILE */

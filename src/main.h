@@ -27,7 +27,7 @@
 #include "timer.h"
 #include "spi.h"
 #include "disp.h"
-//#include "adc.h"
+#include "adc.h"
 
 
 /********************************************************
@@ -60,5 +60,7 @@ void tick10msDelay( uint16_t ticks );
 *RETURN: Nothing
 ********************************************************/
 void SetUp( void );
+
+float GetBatteryVoltage ( void );  //TODO need to comment
 
 #endif
