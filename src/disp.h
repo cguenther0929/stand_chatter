@@ -21,7 +21,10 @@
 #include "config.h"     //Project specific header file
 #include "config.h"
 #include "spi.h"
+#include "main.h"
 
+#define LF			1
+#define CR			2
 
 /********************************************************
 *FUNCTION: void DispCursorHome( void )
@@ -32,7 +35,18 @@
 ********************************************************/
 void DispCursorHome( void );
 
-void DisplayOn ( void );
+void DispClear( void );
+
+void DispInit ( void );
+
+void DispWriteChar (uint8_t c);
+
+void DispWriteString(const char * y);
+
+void DispLineTwo (void );
+
+void DispSetContract(uint8_t percentage);
+
 
 #endif
 /* END OF FILE */

@@ -16,6 +16,9 @@
 /*  DEFINE THE STRUCTURE USED IN THIS FILE */
 struct GlobalInformation sysinfo;
 
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        NEED A SPI2 init and functions for RFM module
+ */
 
 
 void SPI1Init( void ){  // TODO copy this into CPI2Init
@@ -26,8 +29,8 @@ void SPI1Init( void ){  // TODO copy this into CPI2Init
     
     /* CONFIGURE SSP1CON1 p282 */
     CKP1 = 0;                            // Idle clock state is low (default value)
-    SSPCON1bits.SSPM = 0x0;             // 0b0000 SPI Master mode: clock = FOSC/4
-    // SSPCON1bits.SSPM = 0x1;          // 0b0001 SPI Master mode: clock = FOSC/16
+    // SSPCON1bits.SSPM = 0x0;             // 0b0000 SPI Master mode: clock = FOSC/4
+    SSPCON1bits.SSPM = 0x1;          // 0b0001 SPI Master mode: clock = FOSC/16
     // SSPCON1bits.SSPM = 0x2;          // 0b0010 SPI Master mode: clock = FOSC/64
     // SSPCON1bits.SSPM = 0x3;          // 0b0011 Master mode: clock = TMR2 output/2
     // SSPCON1bits.SSPM = 0xA;          // 0b1001 SPI Master mode: clock = FOSC/8
@@ -35,7 +38,7 @@ void SPI1Init( void ){  // TODO copy this into CPI2Init
     SSPEN1 = 1;          // Enable SPI communication via bit in SSP1CON1 register p283
 }
 
-void SPI1Write(uint8_t addr, uint8_t data) {  // TODO need to test 
+void SPI1Write(uint8_t addr, uint8_t data) {  // TODO RFM is on SPI2!!!
 
     uint8_t i;                          // Use as a general variable
     unsigned char rcvd_data;            // Use this to read the received data (should be done)
@@ -68,6 +71,7 @@ void SPI1Write(uint8_t addr, uint8_t data) {  // TODO need to test
     SSP1BUF = data;                     // Send the instruction
     
     while(BF1 != 1);                    // Wait until data is in the buffer (received)
+    // while(SSP2IF != 1);                    // Wait until data is in the buffer (received)
     rcvd_data = SSP1BUF;                // BF1 is cleared by simply  reading received data from SSBUF
 
     for(i = 0; i<spidelay ; i++);       //Add a little delay
@@ -78,9 +82,10 @@ void DispSPI1Write(uint8_t data) {  // TODO need to test
 
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
-       
+
     disp_spi_cs = 0;                    // Slave select low
     for(i = 0; i < spidelay ; i++);       // Add a little delay
+    rcvd_data = SSP1BUF;                // Read the buffer to assure it is emply and BF is cleared
 
     /* SEND DATA */
     WCOL1 = 0;
@@ -91,45 +96,8 @@ void DispSPI1Write(uint8_t data) {  // TODO need to test
     rcvd_data = SSP1BUF;                // BF1 is cleared by simply  reading received data from SSBUF
 
     for(i = 0; i<spidelay ; i++);       //Add a little delay
-    disp_spi_cs = 0;                    // Slave select low
+    disp_spi_cs = 1;                    // Slave select low
 }
-
-// void SPI1Write(UCHAR inst, UCHAR addr, UCHAR data) {  // Working!!  //TODO left in here as an example, can probably remove.  
-
-//     uint8_t i;                             //Use as a general variable
-//     UCHAR rcvd_data;                        //Use this to read the received data (should be done)
-       
-//     RF69_SPI_CS = 0;                    //Slave select low
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-
-//     /* SEND THE INSTRUCTION */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = inst;                      //Send the instruction
-      
-//     while(BF1 != 1);      //Wait until data is in the buffer (received)
-//     rcvd_data = SSP1BUF;     //BF1 is cleared by simply  reading received data from SSBUF
-
-//     /* SEND THE ADDRESS */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = addr;                      //Send the instruction
-   
-//     while(BF1 != 1);      //Wait until data is in the buffer (received)
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-//     for(i = 0; i<200 ; i++);       //Add a little delay
-
-//     /* SEND THE DATA */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = data;                      //Send the instruction
-    
-//     while(BF1 != 1);      //Wait until data is in the buffer (received)
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RF69_SPI_CS = 1;     //Disable the chip
-// }
 
 uint8_t SPI1Read(uint8_t addr) { 
     uint8_t i;                             //Use as a general variable
@@ -267,6 +235,6 @@ uint8_t SPI1Read(uint8_t addr) {
 
 void SPIBurnDelay(void) {
     uint8_t i;        //Used as a counter
-    for(i=0;i<700;i++);  //Add small delay
+    for(i=0;i<255;i++);  //Add small delay
 }
 /* END OF FILE */

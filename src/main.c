@@ -86,10 +86,79 @@ struct GlobalInformation gblinfo;
 void main()
 {
     uint8_t test_data;
+    uint8_t i;
     SetUp();
+    tick100msDelay(5);
     //test_data = SPI1Read(REG_RSSITHRESH);
-    // DisplayOn();
+    DispInit();
 
+    /*TODO the following is just for debug*/
+
+    DispWriteString("HELLO SALTY");
+    DispLineTwo();
+    DispWriteString("TITS!!");
+
+    for(i=0;i < 10; i++);
+
+    for(i=0; i <= 100; i+=5) {
+        DispSetContract(i);
+        tick100msDelay(1);
+    }
+    
+    tick100msDelay(15);
+
+    DispClear();
+    DispCursorHome();
+    DispSetContract(1);
+    tick100msDelay(1);
+
+    DispWriteString("JK! I LOVE YOU,");
+    DispLineTwo();
+    DispWriteString("BABE!");
+
+    for(i=0; i <= 100; i+=5) {
+        DispSetContract(i);
+        tick100msDelay(1);
+    }
+
+    tick100msDelay(50);
+    disp_enable = DISPLAY_OFF;
+    /* TODO end of debug code */
+    
+    /*TODO the following is just for debug*/
+
+    // DispWriteString("WHAT'S UP");
+    // DispLineTwo();
+    // DispWriteString("BRO!?!?");
+
+    // for(i=0;i < 10; i++);
+
+    // for(i=0; i <= 100; i+=5) {
+    //     DispSetContract(i);
+    //     tick100msDelay(1);
+    // }
+    
+    // tick100msDelay(15);
+
+    // DispClear();
+    // DispCursorHome();
+    // DispSetContract(1);
+    // tick100msDelay(1);
+
+    // DispWriteString("LET'S HAVE SOME");
+    // DispLineTwo();
+    // DispWriteString("COLD ONES!");
+
+    // for(i=0; i <= 100; i+=5) {
+    //     DispSetContract(i);
+    //     tick100msDelay(1);
+    // }
+    
+    // tick100msDelay(30);
+    // disp_enable = DISPLAY_OFF;
+    /* TODO end of debug code */
+
+    
     while (true) {
         if(gblinfo.flag100ms) {
             gblinfo.flag10ms = false;
@@ -184,14 +253,17 @@ void SetUp(void)
 
     Init_Interrupts();                  //Set up interrupts  
 
+    /* INITIALIZE SPI INTERFACE */
+    SPI1Init();
+
     // TODO need to see how right or wrong this is
     //AnalogRefSel(EXTREF, EXTREF);       //Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
     //InitA2D(1, 2, 32);                  //Set up AD (Justification, Acq Time (TAD), Prescaler) ==> (Right, 16 TAD, RC Oscillator) -- page 361/550
 
-    gblinfo.tick10ms = 0;       // Initialize 100s of a tick1000mond counter to 0
-    gblinfo.tick100ms = 0;      // Initialize 100s of a tick1000mond counter to 0
-    gblinfo.tick500ms = 0;      // Initialize 100s of a tick1000mond counter to 0
-    gblinfo.tick1000ms = 0;     // Seconds counter
+    gblinfo.tick10ms = 0;       // Initialize 10ms tick coutner
+    gblinfo.tick100ms = 0;      // Initialize 100ms tick coutner
+    gblinfo.tick500ms = 0;      // Initialize 500ms tick coutner
+    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick coutner
 
     /* SETUP ANALOG CHANNELS */  //TODO need to add necessary lines back in for reading battery voltage.
     ANCON0 = 0x00;          // Analog channels 7-0 are configured for digital inputs. p.363     

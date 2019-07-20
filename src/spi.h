@@ -48,6 +48,8 @@
 ********************************************************/
 void SPI1Init( void );
 
+void SPI2Init( void );  //TODO need to comment
+
 /********************************************************
 *FUNCTION: void SPI1Write(uint8_t addr, uint8_t data)
 *PURPOSE: To write data out the SPI port

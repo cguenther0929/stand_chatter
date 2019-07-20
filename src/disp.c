@@ -16,16 +16,20 @@
 /*  DEFINE THE STRUCTURE USED IN THIS FILE */
 // struct GlobalInformation sysinfo;
 
-void DisplayOn ( void ) {
+void DispInit ( void ) {
     uint8_t i;
+    
+    disp_reg_sel = 0;
     disp_enable = DISPLAY_ON;
-    for (i=0;i<255;i++);
+    tick100msDelay(1);
     
     disp_reset = 0;
-    for (i=0;i<255;i++);
+    tick100msDelay(1);
     disp_reset = 1;
+    tick100msDelay(1);
 
-    DispSPI1Write(0x30);
+
+    DispSPI1Write(0x30);            // Send a few wakeup commands (taken from example in datasheet)
     for (i=0;i<20;i++);
     
     DispSPI1Write(0x30);
@@ -34,20 +38,87 @@ void DisplayOn ( void ) {
     DispSPI1Write(0x30);
     for (i=0;i<20;i++);
     
-    DispSPI1Write(0x06);
+    DispSPI1Write(0x39);        // Function set
     for (i=0;i<20;i++);
+
+    DispSPI1Write(0x14);        // Internal oscillator frequency
+    for (i=0;i<20;i++);
+    
+    DispSPI1Write(0x56);        // power control -- taken directly from datasheet -- seems to work as-is
+    for (i=0;i<20;i++);
+    
+    DispSPI1Write(0x6D);        // follower control -- -- taken directly from datasheet -- seems to work as-is
+    for (i=0;i<20;i++);
+    
+    DispSPI1Write(0x70);        // Contrast set.  The lower the second nibble, the harder to see. (i.e. 0x7A will have brighter contrast)
+    for (i=0;i<20;i++);
+    
+    DispSPI1Write(0x0C);        // Entire display ON
+    for (i=0;i<20;i++);
+    
+    DispSPI1Write(0x06);        // Disp entry mode 
+    for (i=0;i<20;i++);
+
+    DispClear();
+    
+    DispCursorHome();
+
+}
+
+void DispSetContract(uint8_t percentage) {
+    uint8_t i;
+    uint8_t contrast_value; 
+    float flt_contrast_value; 
+
+    disp_reg_sel = 0;
+    for (i=0;i<20;i++);
+
+    flt_contrast_value = (float)(percentage*0.16);
+
+    contrast_value = (uint8_t)(flt_contrast_value);
+
+    if(contrast_value > 15) 
+        (contrast_value = 15);
+
+    contrast_value = (uint8_t)(0x70 | contrast_value);
+    
+    DispSPI1Write(contrast_value);
+
+}
+
+void DispClear( void ) {
+    disp_reg_sel = 0;
+    DispSPI1Write(0x01);
 }
 
 void DispCursorHome( void ) {  
+    disp_reg_sel = 0;
+    DispSPI1Write(0x02);
+}
+
+void DispLineTwo (void ) {
+    disp_reg_sel = 0;
+    DispSPI1Write(0xA8);        // Data format D[7:0] = 0b 1 A6 A5 A4 A3 A2 A1 A0.  For 0x40 = 0b 1010 1000 0xA8
+}
+
+void DispWriteChar (uint8_t c) {
     uint8_t i;
     
-    disp_reset = 0;
-    for (i=0;i<255;i++);
-    disp_reset = 1;
+    disp_reg_sel = 1;
+    for (i=0;i<50;i++);
+    DispSPI1Write(c);
 
     disp_reg_sel = 0;
     
-    // DispSPI1Write();
+}
+
+void DispWriteString(const char * y) {
+
+    while(*y != '\0'){
+        DispWriteChar(*y);
+        y++;                           //Increment the pointer memory address
+    }
+
 }
 
 /* END OF FILE */
