@@ -94,42 +94,9 @@ void main()
 
     /*TODO the following is just for debug*/
 
-    DispWriteString("HELLO SALTY");
-    DispLineTwo();
-    DispWriteString("TITS!!");
-
-    for(i=0;i < 10; i++);
-
-    for(i=0; i <= 100; i+=5) {
-        DispSetContract(i);
-        tick100msDelay(1);
-    }
-    
-    tick100msDelay(15);
-
-    DispClear();
-    DispCursorHome();
-    DispSetContract(1);
-    tick100msDelay(1);
-
-    DispWriteString("JK! I LOVE YOU,");
-    DispLineTwo();
-    DispWriteString("BABE!");
-
-    for(i=0; i <= 100; i+=5) {
-        DispSetContract(i);
-        tick100msDelay(1);
-    }
-
-    tick100msDelay(50);
-    disp_enable = DISPLAY_OFF;
-    /* TODO end of debug code */
-    
-    /*TODO the following is just for debug*/
-
-    // DispWriteString("WHAT'S UP");
+    // DispWriteString("HELLO SALTY");
     // DispLineTwo();
-    // DispWriteString("BRO!?!?");
+    // DispWriteString("TITS!!");
 
     // for(i=0;i < 10; i++);
 
@@ -145,17 +112,51 @@ void main()
     // DispSetContract(1);
     // tick100msDelay(1);
 
-    // DispWriteString("LET'S HAVE SOME");
+    // DispWriteString("JK! I LOVE YOU,");
     // DispLineTwo();
-    // DispWriteString("COLD ONES!");
+    // DispWriteString("BABE!");
 
     // for(i=0; i <= 100; i+=5) {
     //     DispSetContract(i);
     //     tick100msDelay(1);
     // }
-    
-    // tick100msDelay(30);
+
+    // tick100msDelay(50);
     // disp_enable = DISPLAY_OFF;
+
+    /* TODO end of debug code */
+    
+    /*TODO the following is just for debug*/
+
+    DispWriteString("WHAT'S UP");
+    DispLineTwo();
+    DispWriteString("BRO!?!?");
+
+    for(i=0;i < 10; i++);
+
+    for(i=0; i <= 100; i+=5) {
+        DispSetContract(i);
+        tick100msDelay(1);
+    }
+
+    tick100msDelay(15);
+
+    DispClear();
+    DispCursorHome();
+    DispSetContract(1);
+    tick100msDelay(1);
+
+    DispWriteString("LET'S HAVE SOME");
+    DispLineTwo();
+    DispWriteString("COLD ONES!");
+
+    for(i=0; i <= 100; i+=5) {
+        DispSetContract(i);
+        tick100msDelay(1);
+    }
+    
+    tick100msDelay(30);
+    disp_enable = DISPLAY_OFF;
     /* TODO end of debug code */
 
     
