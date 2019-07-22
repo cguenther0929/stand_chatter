@@ -50,15 +50,10 @@ void SPI1Init( void );
 
 void SPI2Init( void );  //TODO need to comment
 
-/********************************************************
-*FUNCTION: void SPI1Write(uint8_t addr, uint8_t data)
-*PURPOSE: To write data out the SPI port
-*PRECONDITION: None
-*POSTCONDITION: Data is sent out the SPI port
-*RETURN: Nothing
-********************************************************/
-void SPI1Write(uint8_t addr, uint8_t data);
 
+void RFMSPI2Write(uint8_t addr, uint8_t data);
+
+uint8_t RFMSPI2Read(uint8_t addr);      // TODO need to comment
 
 void DispSPI1Write(uint8_t data);        //TODO need to comment
 

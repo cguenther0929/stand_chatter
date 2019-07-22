@@ -33,6 +33,8 @@ extern struct GlobalInformation         //  Structure to pass information that i
     bool        flag500ms;              // Set every 500ms
     bool        flag1000ms;             // Set every 1000ms
 
+    uint8_t     rfmmode;                // Keep track of the radio's mode
+
 } GlobalInformation;
 
 

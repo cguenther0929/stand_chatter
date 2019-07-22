@@ -86,13 +86,14 @@ struct GlobalInformation gblinfo;
 void main()
 {
     uint8_t test_data;
+    uint8_t rfm_temp;
     uint8_t i;
     float battery_voltage;
     
     SetUp();
     tick100msDelay(5);
     //test_data = SPI1Read(REG_RSSITHRESH);
-    DispInit();
+    // DispInit();
     battery_voltage = GetBatteryVoltage();
 
     DispSetContract(60);
@@ -101,16 +102,25 @@ void main()
     DispWriteFloat(battery_voltage);
 
     tick100msDelay(35);
-    DispSetContract(1);
+    DispSetContract(50);
 
     DispClear();
     DispCursorHome();
     tick100msDelay(1);
-    /*TODO the following is just for debug*/
 
-    // DispWriteString("HELLO SALTY");
+    rfm_temp = RFMreadTemperature (1);
+    DispWriteFloat(rfm_temp);
+
+
+    tick100msDelay(35);
+    disp_enable = DISPLAY_OFF;
+
+
+
+    /* the follow is just for debug */
+    // DispWriteString("WHAT'S UP");
     // DispLineTwo();
-    // DispWriteString("TITS!!");
+    // DispWriteString("BRO!?!?");
 
     // for(i=0;i < 10; i++);
 
@@ -118,7 +128,7 @@ void main()
     //     DispSetContract(i);
     //     tick100msDelay(1);
     // }
-    
+
     // tick100msDelay(15);
 
     // DispClear();
@@ -126,51 +136,17 @@ void main()
     // DispSetContract(1);
     // tick100msDelay(1);
 
-    // DispWriteString("JK! I LOVE YOU,");
+    // DispWriteString("LET'S HAVE SOME");
     // DispLineTwo();
-    // DispWriteString("BABE!");
+    // DispWriteString("COLD ONES!");
 
     // for(i=0; i <= 100; i+=5) {
     //     DispSetContract(i);
     //     tick100msDelay(1);
     // }
-
-    // tick100msDelay(50);
+    
+    // tick100msDelay(30);
     // disp_enable = DISPLAY_OFF;
-
-    /* TODO end of debug code */
-    
-    /*TODO the following is just for debug*/
-
-    DispWriteString("WHAT'S UP");
-    DispLineTwo();
-    DispWriteString("BRO!?!?");
-
-    for(i=0;i < 10; i++);
-
-    for(i=0; i <= 100; i+=5) {
-        DispSetContract(i);
-        tick100msDelay(1);
-    }
-
-    tick100msDelay(15);
-
-    DispClear();
-    DispCursorHome();
-    DispSetContract(1);
-    tick100msDelay(1);
-
-    DispWriteString("LET'S HAVE SOME");
-    DispLineTwo();
-    DispWriteString("COLD ONES!");
-
-    for(i=0; i <= 100; i+=5) {
-        DispSetContract(i);
-        tick100msDelay(1);
-    }
-    
-    tick100msDelay(30);
-    disp_enable = DISPLAY_OFF;
     /* TODO end of debug code */
     
     while (true) {
@@ -190,7 +166,7 @@ void main()
         }
     }
 
-} //END Main()
+}   //END Main()
 
 void SetUp(void)
 {
@@ -266,28 +242,37 @@ void SetUp(void)
     /* TURN OFF THE DISPLAY */
     disp_enable = DISPLAY_OFF;
 
-    Init_Interrupts();                  //Set up interrupts  
+    Init_Interrupts();                          // Set up interrupts  
 
-    /* INITIALIZE SPI INTERFACE */
+    /* INITIALIZE SPI INTERFACE FOR DISPLAY */
     SPI1Init();
 
-    // TODO need to see how right or wrong this is
-    AnalogRefSel(REF2D048, EXTREF);       // Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
-    InitA2D(RIGHT_JUSTIFIED, 4);                      // Set up AD (Justification, Acq Time TADs) ==> (Right, 4 TAD) -- page 361/550
+    /* INITIALIZE SPI INTERFACE FOR DISPLAY */
+    SPI2Init();
 
-    /* SETUP ANALOG CHANNELS */  //TODO need to add necessary lines back in for reading battery voltage.
-    ANCON0 = 0x00;          // Analog channels 7-0 are configured for digital inputs. p.363     
-    ANCON1 = 0x00;          // Analog channel 10-8 are configred for digital inputs. p.364
-    EnableAnalogCh(BAT_VOLTAGE_CH);      // TODO NEED TO ADD THIS LINE IN __Channel for current sense
+    AnalogRefSel(REF2D048, EXTREF);             // Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
+    InitA2D(RIGHT_JUSTIFIED, 4);                // Set up AD (Justification, Acq Time TADs) ==> (Right, 4 TAD) -- page 361/550
+
+    /* SETUP ANALOG CHANNELS */  
+    ANCON0 = 0x00;                      // Analog channels 7-0 are configured for digital inputs. p.363     
+    ANCON1 = 0x00;                      // Analog channel 10-8 are configred for digital inputs. p.364
+    EnableAnalogCh(BAT_VOLTAGE_CH);     // Channel for battery voltage level
     
-    gblinfo.tick10ms = 0;       // Initialize 10ms tick coutner
-    gblinfo.tick100ms = 0;      // Initialize 100ms tick coutner
-    gblinfo.tick500ms = 0;      // Initialize 500ms tick coutner
-    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick coutner
+    gblinfo.tick10ms = 0;       // Initialize 10ms tick counter
+    gblinfo.tick100ms = 0;      // Initialize 100ms tick counter 
+    gblinfo.tick500ms = 0;      // Initialize 500ms tick counter
+    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick counter
 
+    /* INITIALIZE RADIO MODULE */
+    RFMInitialize( 1, 1);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
+    
     /* TIMER FOR APPLICATION INTERRUPTS */
     Timer0Init(TMR0_INTUP_SETTING, TMR0_PRESCALER, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
     Timer0On();             
+    
+    /* INITIALIZE DISPALY */
+    tick100msDelay(5);
+    DispInit();
 }
 
 void tick100msDelay(uint16_t ticks)

@@ -38,44 +38,82 @@ void SPI1Init( void ){  // TODO copy this into CPI2Init
     SSPEN1 = 1;          // Enable SPI communication via bit in SSP1CON1 register p283
 }
 
-void SPI1Write(uint8_t addr, uint8_t data) {  // TODO RFM is on SPI2!!!
+void SPI2Init( void ){ 
+    
+    /* CONFIGURE SSP2STAT REGISTER */
+    SMP2 = 0;           // Input data is sampled at the middle of data output time
+    CKE2 = 1;           // Transmit occurs on the transition from active to idle clock state 
+    
+    /* CONFIGURE SSP2CON1 */
+    CKP2 = 0;                            // Idle clock state is low (default value)
+    // SSP2CON1bits.SSPM = 0x0;             // 0b0000 SPI Master mode: clock = FOSC/4
+    SSP2CON1bits.SSPM = 0x1;          // 0b0001 SPI Master mode: clock = FOSC/16
+    // SSP2CON1bits.SSPM = 0x2;          // 0b0010 SPI Master mode: clock = FOSC/64
+    // SSP2CON1bits.SSPM = 0x3;          // 0b0011 Master mode: clock = TMR2 output/2
+    // SSP2CON1bits.SSPM = 0xA;          // 0b1001 SPI Master mode: clock = FOSC/8
 
+    SSPEN2 = 1;          // Enable SPI communication via bit in SSP1CON1 register p283
+}
+
+void RFMSPI2Write(uint8_t addr, uint8_t data) {  
     uint8_t i;                          // Use as a general variable
-    unsigned char rcvd_data;            // Use this to read the received data (should be done)
+    uint8_t rcvd_data;            // Use this to read the received data (should be done)
        
     RF69_SPI_CS = 0;                    // Slave select low
     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
-    // /* SEND THE INSTRUCTION */
-    // WCOL1    = 0;
-    // SSPOV1   = 0;
-    // SSP1BUF  = addr;                    // Send the instruction
-      
-    // while(BF1 != 1);                    // Wait until data is in the buffer (received)
-    // rcvd_data = SSP1BUF;                // BF1 is cleared by simply  reading received data from SSBUF
-
-    //TODO probably need to first modify the address for read vs. write
-
     /* SEND THE ADDRESS */
-    WCOL1 = 0;
-    SSPOV1 = 0;
-    SSP1BUF = addr;                     // Send the instruction
+    rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
+    WCOL2 = 0;
+    SSPOV2 = 0;
+    SSP2BUF = (addr | 0x80);     // Send the instruction (0x80 for write and 0x00 for read)
    
-    while(BF1 != 1);                    // Wait until data is in the buffer (received)
-    rcvd_data = SSP1BUF;                // BF1 is cleared by simply  reading received data from SSBUF
-    for(i = 0; i<200 ; i++);            // Add a little delay
+    while(BF2 != 1);                    // Wait until data is in the buffer (received)
+    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+    // for(i = 0; i<20 ; i++);          // Add a little delay
 
     /* SEND THE DATA */
-    WCOL1 = 0;
-    SSPOV1=0;
-    SSP1BUF = data;                     // Send the instruction
+    WCOL2 = 0;
+    SSPOV2 = 0;
+    SSP2BUF = data;                     // Send the instruction
     
-    while(BF1 != 1);                    // Wait until data is in the buffer (received)
-    // while(SSP2IF != 1);                    // Wait until data is in the buffer (received)
-    rcvd_data = SSP1BUF;                // BF1 is cleared by simply  reading received data from SSBUF
+    while(BF2 != 1);                    // Wait until data is in the buffer (received)
+    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
 
-    for(i = 0; i<spidelay ; i++);       //Add a little delay
-    RF69_SPI_CS = 1;                    //Disable the chip
+    for(i = 0; i < spidelay ; i++);       // Add a little delay
+    RF69_SPI_CS = 1;                    // Disable the chip
+}
+
+uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
+    
+    uint8_t i;                          // Use as a general variable
+    uint8_t rcvd_data;            // Use this to read the received data (should be done)
+       
+    RF69_SPI_CS = 0;                    // Slave select low
+    for(i = 0; i<spidelay ; i++);       // Add a little delay
+
+    /* SEND THE ADDRESS */
+    rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
+    WCOL2 = 0;
+    SSPOV2 = 0;
+    SSP2BUF = (addr & 0x7F);     // Send the instruction (0x80 for write and 0x00 for read)
+   
+    while(BF2 != 1);                    // Wait until data is in the buffer (received)
+    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+    // for(i = 0; i<20 ; i++);          // Add a little delay  TODO can we remove this delay line?
+
+    /* SEND THE DATA */
+    WCOL2 = 0;
+    SSPOV2 = 0;
+    SSP2BUF = rcvd_data;                     // Send the instruction
+    
+    while(BF2 != 1);                    // Wait until data is in the buffer (received)
+    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+
+    for(i = 0; i < spidelay ; i++);       // Add a little delay
+    RF69_SPI_CS = 1;                    // Disable the chip
+
+    return (rcvd_data);
 }
 
 void DispSPI1Write(uint8_t data) {  // TODO need to test 
