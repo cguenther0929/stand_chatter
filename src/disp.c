@@ -65,7 +65,7 @@ void DispInit ( void ) {
 
 }
 
-void DispSetContract(uint8_t percentage) {
+void DispSetContrast(uint8_t percentage) {
     uint8_t i;
     uint8_t contrast_value; 
     float flt_contrast_value; 
@@ -84,6 +84,11 @@ void DispSetContract(uint8_t percentage) {
     
     DispSPI1Write(contrast_value);
 
+}
+
+void DispRefresh( void ) {
+    DispClear();
+    DispCursorHome();
 }
 
 void DispClear( void ) {
@@ -132,6 +137,18 @@ void DispWriteFloat (float number) {
 
     for(i = 0; i < decimal_count; i++) {    //Print out the array of ASCII characters.
         DispWriteChar(temphex[i]);
+    }
+}
+
+void DispWrite8b (uint8_t number) {
+    uint16_t temp;      //Use for temporary value
+    uint8_t i;         //Counter value
+    for(i = 8; i > 0 ; i--) {
+        temp = number >> (i - 1);
+        temp = temp & 0x01;
+        temp = temp + 0x30;         //Turn this into an ASCII value
+        // TXREG1 = temp;
+        DispWriteChar(temp);
     }
 }
 

@@ -91,67 +91,38 @@ void main()
     float battery_voltage;
     
     SetUp();
-    tick100msDelay(5);
     //test_data = SPI1Read(REG_RSSITHRESH);
-    // DispInit();
     battery_voltage = GetBatteryVoltage();
 
-    DispSetContract(60);
+    DispSetContrast(60);
+    DispRefresh();
     DispWriteString("Battery Voltage");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
-
     tick100msDelay(35);
-    DispSetContract(50);
 
-    DispClear();
-    DispCursorHome();
-    tick100msDelay(1);
+    // DispRefresh();
+    // DispWriteString("BIN Print Tst");
+    // DispLineTwo();
+    // DispWrite8b(253); 
+    // tick100msDelay(50);
 
-    rfm_temp = RFMreadTemperature (1);
-    DispWriteFloat(rfm_temp);
+    DispRefresh();
 
 
-    tick100msDelay(35);
     disp_enable = DISPLAY_OFF;
+    /* END OF DEBUG CODE */
 
 
-
-    /* the follow is just for debug */
-    // DispWriteString("WHAT'S UP");
-    // DispLineTwo();
-    // DispWriteString("BRO!?!?");
-
-    // for(i=0;i < 10; i++);
-
-    // for(i=0; i <= 100; i+=5) {
-    //     DispSetContract(i);
-    //     tick100msDelay(1);
-    // }
-
-    // tick100msDelay(15);
-
-    // DispClear();
-    // DispCursorHome();
-    // DispSetContract(1);
-    // tick100msDelay(1);
-
-    // DispWriteString("LET'S HAVE SOME");
-    // DispLineTwo();
-    // DispWriteString("COLD ONES!");
-
-    // for(i=0; i <= 100; i+=5) {
-    //     DispSetContract(i);
-    //     tick100msDelay(1);
-    // }
-    
-    // tick100msDelay(30);
-    // disp_enable = DISPLAY_OFF;
-    /* TODO end of debug code */
     
     while (true) {
+        if(gblinfo.flag20ms) {
+            gblinfo.flag20ms = false;
+            Events20ms();
+        }
+        
         if(gblinfo.flag100ms) {
-            gblinfo.flag10ms = false;
+            gblinfo.flag100ms = false;
             Events100ms();
         }
 
@@ -159,6 +130,7 @@ void main()
             gblinfo.flag100ms = false;
             Events500ms();
         }
+
 
         if(gblinfo.flag1000ms) {
             gblinfo.flag1000ms = false;
@@ -258,14 +230,11 @@ void SetUp(void)
     ANCON1 = 0x00;                      // Analog channel 10-8 are configred for digital inputs. p.364
     EnableAnalogCh(BAT_VOLTAGE_CH);     // Channel for battery voltage level
     
-    gblinfo.tick10ms = 0;       // Initialize 10ms tick counter
+    gblinfo.tick20ms = 0;       // Initialize 10ms tick counter
     gblinfo.tick100ms = 0;      // Initialize 100ms tick counter 
     gblinfo.tick500ms = 0;      // Initialize 500ms tick counter
     gblinfo.tick1000ms = 0;     // Initialize 1000ms tick counter
 
-    /* INITIALIZE RADIO MODULE */
-    RFMInitialize( 1, 1);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
-    
     /* TIMER FOR APPLICATION INTERRUPTS */
     Timer0Init(TMR0_INTUP_SETTING, TMR0_PRESCALER, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
     Timer0On();             
@@ -273,6 +242,11 @@ void SetUp(void)
     /* INITIALIZE DISPALY */
     tick100msDelay(5);
     DispInit();
+
+    /* INITIALIZE RADIO MODULE */
+    RF69_RST = 0;
+    tick100msDelay(5);
+    RFMInitialize( 1, 1);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
 }
 
 void tick100msDelay(uint16_t ticks)
@@ -286,6 +260,17 @@ void tick100msDelay(uint16_t ticks)
     }
 }
 
+void tick20msDelay(uint16_t ticks)  
+{
+    uint16_t i = 0;
+    uint16_t tick = 0; //Used to lock time value
+    for (i = ticks; i > 0; i--)
+    {
+        tick = gblinfo.tick20ms;
+        while (tick == gblinfo.tick20ms); //Wait for time to wrap around (in one half tick1000mond)
+    }
+}
+
 float GetBatteryVoltage ( void ) {
     float battery_voltage;
     battery_voltage = ReadA2D(BAT_VOLTAGE_CH,1);
@@ -294,15 +279,5 @@ float GetBatteryVoltage ( void ) {
     
     return (battery_voltage);
 }
-// TODO we might want to remove as this function is not support on the stand chatter app.  
-// void tick10msDelay(uint16_t ticks)  
-// {
-//     uint16_t i = 0;
-//     uint16_t tick = 0; //Used to lock time value
-//     for (i = ticks; i > 0; i--)
-//     {
-//         tick = gblinfo.tick10ms;
-//         while (tick == gblinfo.tick10ms); //Wait for time to wrap around (in one half tick1000mond)
-//     }
-// }
+
 /* END OF FILE */

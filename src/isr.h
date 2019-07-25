@@ -77,15 +77,15 @@ void DisableInterrupts( void );
 void EnableInterrupts( void );
 
 /********************************************************
-*FUNCTION: void Events10ms(void)
-*PURPOSE: Runs on a 10 mili-second periodicity  
+*FUNCTION: void Events20ms(void)
+*PURPOSE: Runs on a 20 mili-second periodicity  
 *       This routine is called from the main loop when
-*       the 10ms flag is set in the ISR.  
+*       the 20ms flag is set in the ISR.  
 *PRECONDITION: Interrupts and time base should be setup
 *POSTCONDITION: Action taken on a 1ms boundary
 *RETURN: Nothing
 ********************************************************/
-void Events10ms(void);  
+void Events20ms(void);  
 
 /********************************************************
 *FUNCTION: void Events100ms(void)

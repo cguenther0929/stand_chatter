@@ -46,8 +46,13 @@ void DispWriteString(const char * y);
 
 void DispLineTwo (void );
 
-void DispSetContract(uint8_t percentage);
+void DispSetContrast(uint8_t percentage);
+
+void DispRefresh( void );
 
 void DispWriteFloat (float number);
+
+void DispWrite8b (uint8_t number);
+
 #endif
 /* END OF FILE */

@@ -42,14 +42,14 @@
 void tick100msDelay( uint16_t ticks );
 
 /********************************************************
-*FUNCTION: void tick10msDelay( uint16_t ticks )
+*FUNCTION: void tick20msDelay( uint16_t ticks )
 *PURPOSE: Much more accurate timer that works off interrupts
-            User passes in how many 1/50s he/she wishes to pass 
+            User passes in how many 20ms chunks he/she wishes to pass 
 *PRECONDITION: Timer0 set up and running and set to interrupt
 *POSTCONDITION: Blocking delay inserted
 *RETURN: Nothing
 ********************************************************/
-void tick10msDelay( uint16_t ticks );
+void tick20msDelay( uint16_t ticks );
 
 
 /********************************************************

@@ -27,6 +27,8 @@
 #include "config.h"
 #include "rfm69.h"
 #include "spi.h"
+#include "disp.h"
+#include "main.h"
 
 
 void RFMInitialize( uint8_t networkID, uint8_t nodeID );

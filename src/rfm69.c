@@ -41,50 +41,69 @@ void RFMInitialize( uint8_t networkID, uint8_t nodeID ) {
         { REG_DIOMAPPING2, RF_DIOMAPPING2_CLKOUT_OFF }, // DIO5 ClkOut disable for power saving
         { REG_IRQFLAGS2, RF_IRQFLAGS2_FIFOOVERRUN }, // writing to this bit ensures that the FIFO & status flags are reset
         { REG_RSSITHRESH, 220 }, // must be set to dBm = (-Sensitivity / 2), default is 0xE4 = 228 so -114dBm
-        { REG_PREAMBLELSB, RF_PREAMBLESIZE_LSB_VALUE }, // default 3 preamble bytes 0xAAAAAA
+        //{ REG_PREAMBLELSB, RF_PREAMBLESIZE_LSB_VALUE }, // default 3 preamble bytes 0xAAAAAA
         { REG_SYNCCONFIG, RF_SYNC_ON | RF_SYNC_FIFOFILL_AUTO | RF_SYNC_SIZE_2 | RF_SYNC_TOL_0 },
         { REG_SYNCVALUE1, 0x2D },      // attempt to make this compatible with sync1 byte of RFM12B lib
         { REG_SYNCVALUE2, networkID }, // NETWORK ID
         { REG_PACKETCONFIG1, RF_PACKET1_FORMAT_VARIABLE | RF_PACKET1_DCFREE_OFF | RF_PACKET1_CRC_ON | RF_PACKET1_CRCAUTOCLEAR_ON | RF_PACKET1_ADRSFILTERING_OFF },
         { REG_PAYLOADLENGTH, 66 }, // in variable length mode: the max frame size, not used in TX
-        { REG_NODEADRS, nodeID }, // turned off because we're not using address filtering
+        //{ REG_NODEADRS, nodeID }, // turned off because we're not using address filtering
         { REG_FIFOTHRESH, RF_FIFOTHRESH_TXSTART_FIFONOTEMPTY | RF_FIFOTHRESH_VALUE }, // TX on FIFO not empty
-        { REG_PACKETCONFIG2, RF_PACKET2_RXRESTARTDELAY_2BITS | RF_PACKET2_AUTORXRESTART_ON | RF_PACKET2_AES_OFF }, // RXRESTARTDELAY must match transmitter PA ramp-down time (bitrate dependent)
+        //{ REG_PACKETCONFIG2, RF_PACKET2_RXRESTARTDELAY_2BITS | RF_PACKET2_AUTORXRESTART_ON | RF_PACKET2_AES_OFF }, // RXRESTARTDELAY must match transmitter PA ramp-down time (bitrate dependent)
         { REG_TESTDAGC, RF_DAGC_IMPROVED_LOWBETA0 }, // run DAGC continuously in RX mode for Fading Margin Improvement, recommended default for AfcLowBetaOn=0
         {255, 0}
   };
 
-    // TODO need to figure out sync stuff
-    // TODO may want to take some action when we timeout (i.e. i ctr reaches a high value)
+
     uint8_t i = 0;
     do {
         RFMSPI2Write(REG_SYNCVALUE1, 0xAA); 
         i++;
-    } while (RFMSPI2Read(REG_SYNCVALUE1) != 0xAA && i < 20);
+    } while (RFMSPI2Read(REG_SYNCVALUE1) != 0xAA && i < 50);
+
+    if(i >= 49) {
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("TIMEOUT AA SYNC");
+        tick100msDelay(20);
+    }
     
     i = 0;
     do {
         RFMSPI2Write(REG_SYNCVALUE1, 0x55); 
         i++;
-    } while (RFMSPI2Read(REG_SYNCVALUE1) != 0x55 && i < 20);
+    } while (RFMSPI2Read(REG_SYNCVALUE1) != 0x55 && i < 50);
     
+    if(i >= 49) {
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("TIMEOUT 55 SYNC");
+        tick100msDelay(20);
+    }
         
     for (uint8_t i = 0; RFM_CONFIG[i][0] != 255; i++)           // Send the massive configuration array
         RFMSPI2Write(RFM_CONFIG[i][0], RFM_CONFIG[i][1]);
 
   
-    // TODO for now we're just removing encryption just as down in the RadioHead Library
+    // Remove encryption just as done in the RadioHead Library
     // Disable it during initialization so we always start from a known state.
     RFMencrypt(0);   
 
-    RFMsetHighPower(true);
+    RFMsetHighPower(true);          // For RFM69, must be in high power mode to transmit
 
     RFMsetMode(RF69_MODE_STANDBY);
 
     i = 0;
-    // while (((RFMSPI2Read(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00) && i < 20) {     // wait for ModeReady
-    //     i++;
-    // }  // wait for ModeReady
+    while (((RFMSPI2Read(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00) && i < 20) {     // wait for ModeReady
+        i++;
+    } 
+    
+    if(i >= 19) {
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("TIMEOUT MODE RDY");
+        tick100msDelay(20);
+    }
 
 }
 
@@ -161,3 +180,58 @@ uint8_t RFMreadTemperature(uint8_t calFactor) // returns centigrade
     
     return ~RFMSPI2Read(REG_TEMP2) + COURSE_TEMP_COEF + calFactor; // 'complement' corrects the slope, rising temp = rising val
 } 
+
+// void RFMsend(uint16_t toAddress, const void* buffer, uint8_t bufferSize, bool requestACK)
+// {
+//   writeReg(REG_PACKETCONFIG2, (readReg(REG_PACKETCONFIG2) & 0xFB) | RF_PACKET2_RXRESTART); // avoid RX deadlocks
+//   while (!canSend() && millis() - now < RF69_CSMA_LIMIT_MS) receiveDone();
+//   sendFrame(toAddress, buffer, bufferSize, requestACK, false);
+// }
+
+// bool RFM69::canSend()
+// {
+//   if (_mode == RF69_MODE_RX && PAYLOADLEN == 0 && readRSSI() < CSMA_LIMIT) // if signal stronger than -100dBm is detected assume channel activity
+//   {
+//     setMode(RF69_MODE_STANDBY);
+//     return true;
+//   }
+//   return false;
+// }
+
+// void RFM69::sendFrame(uint16_t toAddress, const void* buffer, uint8_t bufferSize, bool requestACK, bool sendACK)
+// {
+//   setMode(RF69_MODE_STANDBY); // turn off receiver to prevent reception while filling fifo
+//   while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // wait for ModeReady
+//   writeReg(REG_DIOMAPPING1, RF_DIOMAPPING1_DIO0_00); // DIO0 is "Packet Sent"
+//   if (bufferSize > RF69_MAX_DATA_LEN) bufferSize = RF69_MAX_DATA_LEN;
+
+//   // control byte
+//   uint8_t CTLbyte = 0x00;
+//   if (sendACK)
+//     CTLbyte = RFM69_CTL_SENDACK;
+//   else if (requestACK)
+//     CTLbyte = RFM69_CTL_REQACK;
+
+//   if (toAddress > 0xFF) CTLbyte |= (toAddress & 0x300) >> 6; //assign last 2 bits of address if > 255
+//   if (_address > 0xFF) CTLbyte |= (_address & 0x300) >> 8;   //assign last 2 bits of address if > 255
+
+//   // write to FIFO
+//   select();
+//   SPI.transfer(REG_FIFO | 0x80);
+//   SPI.transfer(bufferSize + 3);
+//   SPI.transfer((uint8_t)toAddress);
+//   SPI.transfer((uint8_t)_address);
+//   SPI.transfer(CTLbyte);
+
+//   for (uint8_t i = 0; i < bufferSize; i++)
+//     SPI.transfer(((uint8_t*) buffer)[i]);
+//   unselect();
+
+//   // no need to wait for transmit mode to be ready since its handled by the radio
+//   setMode(RF69_MODE_TX);
+//   uint32_t txStart = millis();
+//   while (digitalRead(_interruptPin) == 0 && millis() - txStart < RF69_TX_LIMIT_MS); // wait for DIO0 to turn HIGH signalling transmission finish
+//   //while (readReg(REG_IRQFLAGS2) & RF_IRQFLAGS2_PACKETSENT == 0x00); // wait for ModeReady
+//   setMode(RF69_MODE_STANDBY);
+// }
+

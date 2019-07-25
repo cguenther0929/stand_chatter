@@ -62,11 +62,12 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
     RF69_SPI_CS = 0;                    // Slave select low
     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
-    /* SEND THE ADDRESS */
     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
+    
+    /* SEND THE ADDRESS */
     WCOL2 = 0;
     SSPOV2 = 0;
-    SSP2BUF = (addr | 0x80);     // Send the instruction (0x80 for write and 0x00 for read)
+    SSP2BUF = (addr | 0x80);            // Send the instruction (0x80 for write and 0x00 for read)
    
     while(BF2 != 1);                    // Wait until data is in the buffer (received)
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
@@ -96,16 +97,14 @@ uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
     WCOL2 = 0;
     SSPOV2 = 0;
-    SSP2BUF = (addr & 0x7F);     // Send the instruction (0x80 for write and 0x00 for read)
+    SSP2BUF = (addr & 0x7F);            // Send the instruction (0x80 for write and 0x00 for read)
    
     while(BF2 != 1);                    // Wait until data is in the buffer (received)
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
     // for(i = 0; i<20 ; i++);          // Add a little delay  TODO can we remove this delay line?
 
-    /* SEND THE DATA */
-    WCOL2 = 0;
-    SSPOV2 = 0;
-    SSP2BUF = rcvd_data;                     // Send the instruction
+    /* SEND GARBAGE TO GRAB THE DATA */
+    SSP2BUF = 0x55;                     // Send the instruction
     
     while(BF2 != 1);                    // Wait until data is in the buffer (received)
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
