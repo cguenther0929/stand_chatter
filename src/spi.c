@@ -59,7 +59,7 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
        
-    RF69_SPI_CS = 0;                    // Slave select low
+    RFM_SPI_CS = 0;                    // Slave select low
     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
@@ -82,7 +82,28 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
 
     for(i = 0; i < spidelay ; i++);       // Add a little delay
-    RF69_SPI_CS = 1;                    // Disable the chip
+    RFM_SPI_CS = 1;                    // Disable the chip
+}
+
+void RFMSPI2WriteByte(uint8_t data) {  
+    uint8_t i;                          // Use as a general variable
+    uint8_t rcvd_data;            // Use this to read the received data (should be done)
+       
+    RFM_SPI_CS = 0;                    // Slave select low
+    for(i = 0; i<spidelay ; i++);       // Add a little delay
+
+    rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
+    
+    /* SEND THE DATA */
+    WCOL2 = 0;
+    SSPOV2 = 0;
+    SSP2BUF = data;                     // Send the instruction
+    
+    while(BF2 != 1);                    // Wait until data is in the buffer (received)
+    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+
+    for(i = 0; i < spidelay ; i++);       // Add a little delay
+    RFM_SPI_CS = 1;                    // Disable the chip
 }
 
 uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
@@ -90,7 +111,7 @@ uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
        
-    RF69_SPI_CS = 0;                    // Slave select low
+    RFM_SPI_CS = 0;                    // Slave select low
     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
     /* SEND THE ADDRESS */
@@ -110,7 +131,7 @@ uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
 
     for(i = 0; i < spidelay ; i++);       // Add a little delay
-    RF69_SPI_CS = 1;                    // Disable the chip
+    RFM_SPI_CS = 1;                    // Disable the chip
 
     return (rcvd_data);
 }
@@ -140,7 +161,7 @@ uint8_t SPI1Read(uint8_t addr) {
     uint8_t i;                             //Use as a general variable
     uint8_t data;        //Use this to read the received data (should be done)
     
-    RF69_SPI_CS = 0;             //Slave select low
+    RFM_SPI_CS = 0;             //Slave select low
     for(i = 0; i < spidelay ; i++);       //Add a little delay
 
     //TODO: need to modify the address for read operation first!! This probably needs work, in general!
@@ -161,7 +182,7 @@ uint8_t SPI1Read(uint8_t addr) {
     data = SSP1BUF;
    
     for(i = 0; i<spidelay ; i++);       //Add a little delay
-    RF69_SPI_CS = 1;     //Diable the chip
+    RFM_SPI_CS = 1;     //Diable the chip
 
     return data;    //Return the 8bits of data
 
@@ -171,7 +192,7 @@ uint8_t SPI1Read(uint8_t addr) {
 //     uint8_t i;                             //Use as a general variable
 //     UCHAR rcvd_data;        //Use this to read the received data (should be done)
 
-//     RF69_SPI_CS = 0;             //Slave select low
+//     RFM_SPI_CS = 0;             //Slave select low
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
 
 //     /* SEND THE INSTRUCTION */
@@ -194,14 +215,14 @@ uint8_t SPI1Read(uint8_t addr) {
 //     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
    
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RF69_SPI_CS = 1;     //Disable the chip
+//     RFM_SPI_CS = 1;     //Disable the chip
 // }
 
 // UCHAR PromStatus( void ) { //I think this function is good
 //     uint8_t i;                             //Use as a general variable
 //     UCHAR data;        //Use this to read the received data (should be done)
         
-//     RF69_SPI_CS = 0;             //Slave select low
+//     RFM_SPI_CS = 0;             //Slave select low
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
 
 //     /* SEND THE INSTRUCTION */
@@ -221,7 +242,7 @@ uint8_t SPI1Read(uint8_t addr) {
 //     data = SSP1BUF;  //BF1 is cleared by simply  reading received data from SSBUF
     
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RF69_SPI_CS = 1;     //Diable the chip
+//     RFM_SPI_CS = 1;     //Diable the chip
 
 //     return data;    //Return the 8bits of data
 // }
@@ -229,7 +250,7 @@ uint8_t SPI1Read(uint8_t addr) {
 // void DisableWrite( void ) {
 //     uint8_t i;             //Used as a counter
 //     UCHAR rcvd_data;        //Used to empty the SPI buffer
-//     RF69_SPI_CS = 0;             //Slave select low
+//     RFM_SPI_CS = 0;             //Slave select low
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
 
 //     /* SEND THE INSTRUCTION */
@@ -241,13 +262,13 @@ uint8_t SPI1Read(uint8_t addr) {
 //     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
 
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RF69_SPI_CS = 1;     //Disable the chip
+//     RFM_SPI_CS = 1;     //Disable the chip
 // }
 
 // void EnableWrite( void ) {
 //     uint8_t i;             //Used as a counter
 //     UCHAR rcvd_data;        //Used to empty the SPI buffer
-//     RF69_SPI_CS = 0;             //Slave select low
+//     RFM_SPI_CS = 0;             //Slave select low
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
 
 //     /* SEND THE INSTRUCTION */
@@ -259,7 +280,7 @@ uint8_t SPI1Read(uint8_t addr) {
 //     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
 
 //     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RF69_SPI_CS = 1;     //Disable the chip
+//     RFM_SPI_CS = 1;     //Disable the chip
 // }
 
 // void PromOn(void) {

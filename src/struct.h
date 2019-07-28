@@ -36,7 +36,11 @@ extern struct GlobalInformation         //  Structure to pass information that i
     bool        flag500ms;              // Set every 500ms
     bool        flag1000ms;             // Set every 1000ms
 
+    /* RADIO TRANSCEIVER RELATED */
     uint8_t     rfmmode;                // Keep track of the radio's mode
+    uint8_t     payloadlen;             // Will track the length of the received payload 
+    int16_t     rssi_lvl;               // For tracking the value of the RSSI (received signal strength indicator)
+    uint8_t     our_address;            // Sent as source address when sending frames
 
 } GlobalInformation;
 

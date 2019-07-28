@@ -43,6 +43,12 @@ void RFMsetHighPower (bool onOff);
 
 uint8_t RFMreadTemperature(uint8_t calFactor);
 
+int16_t RFMreadRSSI( void );
+
+bool RFMcanSend( void );
+
+void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
+
 
 /* SPI COMM HELP BITS */  //TODO remove these lines
 // #define RFM_READ                        0x80

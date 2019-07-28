@@ -85,6 +85,8 @@ struct GlobalInformation gblinfo;
 
 void main()
 {
+    // uint8_t * data;
+    uint8_t data[30];
     uint8_t test_data;
     uint8_t rfm_temp;
     uint8_t i;
@@ -107,7 +109,20 @@ void main()
     // DispWrite8b(253); 
     // tick100msDelay(50);
 
-    DispRefresh();
+    // *data = "Testing";
+    for(i=0;i<10;i++) {
+
+        DispRefresh();
+        DispWriteString("Sending message...");
+        tick100msDelay(10);
+        
+        RFMSend(0x53,"HELLO",0x05);
+        DispRefresh();
+        DispWriteString("Done...");
+        tick100msDelay(10);
+    }    
+    
+    
 
 
     disp_enable = DISPLAY_OFF;
@@ -159,12 +174,12 @@ void SetUp(void)
     TRISD6 = output;                    // RFM module SPI SCK signal
     TRISD7 = output;                    // RFM module SPI #CS signal
     
-    TRISE2 = output;                    // RFM DIO5 signal
-    TRISE3 = output;                    // RFM DIO4 signal
-    TRISE4 = output;                    // RFM DIO3 signal
-    TRISE5 = output;                    // RFM DIO2 signal
-    TRISE6 = output;                    // RFM DIO1 signal
-    TRISE7 = output;                    // RFM DIO0 and IRQ signal
+    TRISE2 = input;                    // RFM DIO5 signal
+    TRISE3 = input;                    // RFM DIO4 signal
+    TRISE4 = input;                    // RFM DIO3 signal
+    TRISE5 = input;                    // RFM DIO2 signal
+    TRISE6 = input;                    // RFM DIO1 signal
+    TRISE7 = input;                     // RFM DIO0 and IRQ signal
 
     /* PIN DIRECTION FOR DISPLAY SPI AND GPIO */
     TRISB4 = output;                    // Active low output enables display
@@ -244,9 +259,11 @@ void SetUp(void)
     DispInit();
 
     /* INITIALIZE RADIO MODULE */
-    RF69_RST = 0;
+    RFM_RST = 0;
+    gblinfo.payloadlen  = 0;
+    gblinfo.rssi_lvl    = 0;
     tick100msDelay(5);
-    RFMInitialize( 1, 1);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
+    RFMInitialize( 1, 11);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
 }
 
 void tick100msDelay(uint16_t ticks)

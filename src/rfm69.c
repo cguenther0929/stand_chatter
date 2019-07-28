@@ -18,6 +18,9 @@
 /* 
 CAN GET A LOT OF INFO FROM HERE:  https://github.com/LowPowerLab/RFM69/blob/master/RFM69.cpp
 Check out the massive x by 2 config array on line 66 -- we might want to do the same thing
+
+Here's a link directly to the radiohead git repo https://github.com/PaulStoffregen/RadioHead
+
 */
 #include "rfm69.h"		    // Include the header file for this module
 
@@ -54,6 +57,7 @@ void RFMInitialize( uint8_t networkID, uint8_t nodeID ) {
         {255, 0}
   };
 
+    gblinfo.our_address = nodeID;
 
     uint8_t i = 0;
     do {
@@ -114,7 +118,7 @@ void RFMencrypt(const char* key) {
     // #if defined(RF69_LISTENMODE_ENABLE)
     //   _haveEncryptKey = key;
     // #endif
-    //   setMode(RF69_MODE_STANDBY);
+    //   RFMsetMode(RF69_MODE_STANDBY);
     
     // if (key != 0)
     // {
@@ -122,9 +126,9 @@ void RFMencrypt(const char* key) {
     //     memcpy(_encryptKey, key, 16);
     // #endif
     //     select();
-    //     SPI.transfer(REG_AESKEY1 | 0x80);
+    //     RFMSPI2Write(REG_AESKEY1 | 0x80);
     //     for (uint8_t i = 0; i < 16; i++)
-    //         SPI.transfer(key[i]);
+    //         RFMSPI2Write(key[i]);
     //     unselect();
     // }
     RFMSPI2Write(REG_PACKETCONFIG2, (RFMSPI2Read(REG_PACKETCONFIG2) & 0xFE) | (key ? 1 : 0));
@@ -181,57 +185,78 @@ uint8_t RFMreadTemperature(uint8_t calFactor) // returns centigrade
     return ~RFMSPI2Read(REG_TEMP2) + COURSE_TEMP_COEF + calFactor; // 'complement' corrects the slope, rising temp = rising val
 } 
 
-// void RFMsend(uint16_t toAddress, const void* buffer, uint8_t bufferSize, bool requestACK)
+// void RFMsend(uint16_t toAddress, const void* buffer, uint8_t bufferSize)
 // {
-//   writeReg(REG_PACKETCONFIG2, (readReg(REG_PACKETCONFIG2) & 0xFB) | RF_PACKET2_RXRESTART); // avoid RX deadlocks
-//   while (!canSend() && millis() - now < RF69_CSMA_LIMIT_MS) receiveDone();
-//   sendFrame(toAddress, buffer, bufferSize, requestACK, false);
 // }
 
-// bool RFM69::canSend()
-// {
-//   if (_mode == RF69_MODE_RX && PAYLOADLEN == 0 && readRSSI() < CSMA_LIMIT) // if signal stronger than -100dBm is detected assume channel activity
-//   {
-//     setMode(RF69_MODE_STANDBY);
-//     return true;
-//   }
-//   return false;
-// }
+bool RFMcanSend( void ) {
+  if (gblinfo.rfmmode == RF69_MODE_RX && gblinfo.payloadlen == 0 && RFMreadRSSI() < CSMA_LIMIT) // if signal stronger than -100dBm is detected assume channel activity
+  {
+    RFMsetMode(RF69_MODE_STANDBY);
+    return true;
+  }
+  return false;
+}
 
-// void RFM69::sendFrame(uint16_t toAddress, const void* buffer, uint8_t bufferSize, bool requestACK, bool sendACK)
-// {
-//   setMode(RF69_MODE_STANDBY); // turn off receiver to prevent reception while filling fifo
-//   while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // wait for ModeReady
-//   writeReg(REG_DIOMAPPING1, RF_DIOMAPPING1_DIO0_00); // DIO0 is "Packet Sent"
-//   if (bufferSize > RF69_MAX_DATA_LEN) bufferSize = RF69_MAX_DATA_LEN;
+void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize) {
+    uint8_t i = 0;
+    
+    RFMSPI2Write(REG_PACKETCONFIG2, (RFMSPI2Read(REG_PACKETCONFIG2) & 0xFB) | RF_PACKET2_RXRESTART); // avoid RX deadlocks
+    // while (!RFMcanSend() && millis() - now < RF69_CSMA_LIMIT_MS) receiveDone(); //TODO we need to add this hardening back in.  Basically, we can't send if a receive operation isn't complete 
+    while (!RFMcanSend() && i < 50) i++;
+    
+    RFMsetMode(RF69_MODE_STANDBY); // turn off receiver to prevent reception while filling fifo
+    while ((RFMSPI2Read(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // wait for ModeReady
+    
+    RFMSPI2Write(REG_DIOMAPPING1, RF_DIOMAPPING1_DIO0_00); // DIO0 is "Packet Sent"
+    if (bufferSize > RF69_MAX_DATA_LEN) bufferSize = RF69_MAX_DATA_LEN;
 
-//   // control byte
-//   uint8_t CTLbyte = 0x00;
-//   if (sendACK)
-//     CTLbyte = RFM69_CTL_SENDACK;
-//   else if (requestACK)
-//     CTLbyte = RFM69_CTL_REQACK;
+    // control byte
+    uint8_t CTLbyte = 0x00;
+    // if (sendACK)
+    // CTLbyte = RFM69_CTL_SENDACK;
+    // else if (requestACK)
+    // CTLbyte = RFM69_CTL_REQACK;
 
-//   if (toAddress > 0xFF) CTLbyte |= (toAddress & 0x300) >> 6; //assign last 2 bits of address if > 255
-//   if (_address > 0xFF) CTLbyte |= (_address & 0x300) >> 8;   //assign last 2 bits of address if > 255
+    if (toAddress > 0xFF) CTLbyte |= (toAddress & 0x300) >> 6; //assign last 2 bits of address if > 255
+    if (gblinfo.our_address > 0xFF) CTLbyte |= (gblinfo.our_address & 0x300) >> 8;   //assign last 2 bits of address if > 255
 
-//   // write to FIFO
-//   select();
-//   SPI.transfer(REG_FIFO | 0x80);
-//   SPI.transfer(bufferSize + 3);
-//   SPI.transfer((uint8_t)toAddress);
-//   SPI.transfer((uint8_t)_address);
-//   SPI.transfer(CTLbyte);
+    // write to FIFO
+    RFMSPI2WriteByte(REG_FIFO | 0x80);
+    RFMSPI2WriteByte(bufferSize + 3);
+    RFMSPI2WriteByte((uint8_t)toAddress);
+    RFMSPI2WriteByte((uint8_t)gblinfo.our_address);
+    RFMSPI2WriteByte(CTLbyte);
 
-//   for (uint8_t i = 0; i < bufferSize; i++)
-//     SPI.transfer(((uint8_t*) buffer)[i]);
-//   unselect();
+    for (i = 0; i < bufferSize; i++)
+        RFMSPI2WriteByte(((uint8_t*) buffer)[i]);
 
-//   // no need to wait for transmit mode to be ready since its handled by the radio
-//   setMode(RF69_MODE_TX);
-//   uint32_t txStart = millis();
-//   while (digitalRead(_interruptPin) == 0 && millis() - txStart < RF69_TX_LIMIT_MS); // wait for DIO0 to turn HIGH signalling transmission finish
-//   //while (readReg(REG_IRQFLAGS2) & RF_IRQFLAGS2_PACKETSENT == 0x00); // wait for ModeReady
-//   setMode(RF69_MODE_STANDBY);
-// }
+    // no need to wait for transmit mode to be ready since its handled by the radio
+    RFMsetMode(RF69_MODE_TX);
+    
+    i = 0;
+    while (RFM_IRQ_PIN == 0 && i < 200 ) i++; // wait for DIO0 to turn HIGH signalling transmission finish
+
+    if (i >= 199) {          //TODO can delete this DEBUG code.  
+        DispRefresh();
+        DispWriteString("ERROR!!");
+        tick100msDelay(50);
+    }
+    
+    RFMsetMode(RF69_MODE_STANDBY);
+}
+
+int16_t RFMreadRSSI( void ) {
+    int16_t rssi = 0;
+    //   if (forceTrigger)
+    //   {
+    //     // RSSI trigger not needed if DAGC is in continuous mode
+    //     writeReg(REG_RSSICONFIG, RF_RSSI_START);
+    //     while ((readReg(REG_RSSICONFIG) & RF_RSSI_DONE) == 0x00); // wait for RSSI_Ready
+    //   }
+    rssi = -RFMSPI2Read(REG_RSSIVALUE);
+    rssi >>= 1;
+    gblinfo.rssi_lvl = rssi;
+    return rssi;
+}
 
