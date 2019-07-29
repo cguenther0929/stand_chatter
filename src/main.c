@@ -116,7 +116,7 @@ void main()
         DispWriteString("Sending message...");
         tick100msDelay(10);
         
-        RFMSend(0x53,"HELLO",0x05);
+        // RFMSend(0x53,"HELLO",0x05);
         DispRefresh();
         DispWriteString("Done...");
         tick100msDelay(10);
