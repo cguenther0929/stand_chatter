@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "config.h"             //Project specific header file
+#include "rfm69.h"
+
+
 
 extern struct GlobalInformation         //  Structure to pass information that is shared among modules
 {
@@ -40,7 +43,8 @@ extern struct GlobalInformation         //  Structure to pass information that i
     uint8_t     rfmmode;                // Keep track of the radio's mode
     uint8_t     payloadlen;             // Will track the length of the received payload 
     int16_t     rssi_lvl;               // For tracking the value of the RSSI (received signal strength indicator)
-    uint8_t     our_address;            // Sent as source address when sending frames
+    uint8_t     OurAddress;             // Sent as source address when sending frames
+    uint8_t     DestAddress;            // Sent as source address when sending frames
 
 } GlobalInformation;
 

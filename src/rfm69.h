@@ -32,12 +32,14 @@
 #include "main.h"
 
 typedef enum {
-    RF95_MODE_IDLE,    
-    RF95_MODE_SLEEP,   
-    RF69_MODE_STANDBY,
-    RF69_MODE_RX,     
-    RF69_MODE_TX     
+    RFM_MODE_IDLE,    
+    RFM_MODE_SLEEP,   
+    RFM_MODE_STANDBY,
+    RFM_MODE_RX,     
+    RFM_MODE_TX     
 } RadioOpMode;
+
+extern RadioOpMode radioopmode;
 
 /// Choices for setModemConfig() for a selected subset of common
 /// data rates. If you need another configuration,
@@ -62,7 +64,7 @@ typedef struct {
     uint8_t    reg_26;   ///< Value for register RH_RF95_REG_26_MODEM_CONFIG3
 } ModemConfig;
 
-void RFMInitialize( uint8_t networkID, uint8_t nodeID );
+void RFMInitialize( void );
 
 void RFMencrypt(const char * key);
 
@@ -90,6 +92,29 @@ void RFMsetModemRegisters(const ModemConfig* config);
 
 void RFMsetPreambleLength(uint16_t bytes);
 
+bool RFMtxInProgress( void );
+
+// This is the address that indicates a broadcast
+#define RFM_BROADCAST_ADDRESS 0xff
+
+// Max number of octets the LORA Rx/Tx FIFO can hold
+#define RFM_FIFO_SIZE 255
+
+// This is the maximum number of bytes that can be carried by the LORA.
+// We use some for headers, keeping fewer for RadioHead messages
+#define RFM_MAX_PAYLOAD_LEN RFM_FIFO_SIZE
+
+// The length of the headers we add.
+// The headers are inside the LORA's payload
+#define RFM_HEADER_LEN 4
+
+// This is the maximum message length that can be supported by this driver. 
+// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Here we allow for 1 byte message length, 4 bytes headers, user data and 2 bytes of FCS
+#ifndef RFM_MAX_MESSAGE_LEN
+ #define RFM_MAX_MESSAGE_LEN (RFM_MAX_PAYLOAD_LEN - RFM_HEADER_LEN)
+#endif
+
 // The crystal oscillator frequency of the module
 #define RH_RF95_FXOSC 32000000.0
 
@@ -102,7 +127,7 @@ void RFMsetPreambleLength(uint16_t bytes);
 #define CSMA_LIMIT              -90 // upper RX signal sensitivity threshold in dBm for carrier sense access
 
 // Register names (LoRa Mode, from table 85)
-#define RH_RF95_REG_00_FIFO                                0x00
+#define RFM_REG_00_FIFO                                0x00
 #define RH_RF95_REG_01_OP_MODE                             0x01
 #define RH_RF95_REG_02_RESERVED                            0x02
 #define RH_RF95_REG_03_RESERVED                            0x03

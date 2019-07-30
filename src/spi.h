@@ -55,6 +55,8 @@ void RFMSPI2Write(uint8_t addr, uint8_t data);
 
 void RFMSPI2WriteByte(uint8_t data);
 
+void RFMSPI2WriteBurst(uint8_t addr, uint8_t * data, uint8_t len);
+
 uint8_t RFMSPI2Read(uint8_t addr);      // TODO need to comment
 
 void DispSPI1Write(uint8_t data);        //TODO need to comment

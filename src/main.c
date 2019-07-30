@@ -121,14 +121,9 @@ void main()
         DispWriteString("Done...");
         tick100msDelay(10);
     }    
-    
-    
-
 
     disp_enable = DISPLAY_OFF;
     /* END OF DEBUG CODE */
-
-
     
     while (true) {
         if(gblinfo.flag20ms) {
@@ -263,7 +258,13 @@ void SetUp(void)
     gblinfo.payloadlen  = 0;
     gblinfo.rssi_lvl    = 0;
     tick100msDelay(5);
-    RFMInitialize( 1, 11);        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
+    RFMInitialize( );        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
+    if(!RFMsetFrequency(915.0)) {
+        DispSetContrast(60);
+        DispRefresh();
+        DispWriteString("SET FREQ FAILED");
+        tick100msDelay(35);
+    }
 }
 
 void tick100msDelay(uint16_t ticks)
