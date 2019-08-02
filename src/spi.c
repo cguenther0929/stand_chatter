@@ -85,7 +85,7 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
     RFM_SPI_CS = 1;                    // Disable the chip
 }
 
-void RFMSPI2WriteBurst(uint8_t addr, uint8_t * data, uint8_t len) {
+void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len) {
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
        

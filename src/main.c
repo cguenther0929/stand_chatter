@@ -90,6 +90,7 @@ void main()
     uint8_t test_data;
     uint8_t rfm_temp;
     uint8_t i;
+    bool status;
     float battery_voltage;
     
     SetUp();
@@ -116,7 +117,7 @@ void main()
         DispWriteString("Sending message...");
         tick100msDelay(10);
         
-        // RFMSend(0x53,"HELLO",0x05);
+        status = RFMsend("HELLO",0x05);
         DispRefresh();
         DispWriteString("Done...");
         tick100msDelay(10);
@@ -254,7 +255,7 @@ void SetUp(void)
     DispInit();
 
     /* INITIALIZE RADIO MODULE */
-    RFM_RST = 0;
+    RFM_RST = 1;
     gblinfo.payloadlen  = 0;
     gblinfo.rssi_lvl    = 0;
     tick100msDelay(5);

@@ -80,7 +80,9 @@ uint8_t RFMreadTemperature(uint8_t calFactor);
 
 bool RFMcanSend( void );
 
-void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
+// void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
+
+bool RFMsend(const char * data, uint8_t len);
 
 bool RFMsetFrequency (float centre);
 

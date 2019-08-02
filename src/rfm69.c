@@ -109,7 +109,7 @@ void RFMsetMode(RadioOpMode mode) {
 
 }
 
-bool RFMsend(const uint8_t* data, uint8_t len)
+bool RFMsend(const char * data, uint8_t len)
 {
     uint8_t i = 0;
     
@@ -117,12 +117,13 @@ bool RFMsend(const uint8_t* data, uint8_t len)
 
     //TODO do we want to insert a blocking function here that verifies we're okay 
     // to transmit a packet. 
-    while (RFMtxInProgress() && 50 > i++);    
+    // while (RFMtxInProgress() && 50 > i++);    
     
     RFMsetMode(RFM_MODE_IDLE);
 
     // Position at the beginning of the FIFO
     RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
+    
     // The headers
     RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);       // Enter destination address
     RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);          // Source address
