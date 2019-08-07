@@ -53,7 +53,7 @@ void SPI2Init( void );  //TODO need to comment
 
 void RFMSPI2Write(uint8_t addr, uint8_t data);
 
-void RFMSPI2WriteByte(uint8_t data);
+// void RFMSPI2WriteByte(uint8_t data);
 
 void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len);
 

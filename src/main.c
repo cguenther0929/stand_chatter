@@ -175,7 +175,7 @@ void SetUp(void)
     TRISE4 = input;                    // RFM DIO3 signal
     TRISE5 = input;                    // RFM DIO2 signal
     TRISE6 = input;                    // RFM DIO1 signal
-    TRISE7 = input;                     // RFM DIO0 and IRQ signal
+    TRISE7 = input;                    // RFM DIO0 and IRQ signal
 
     /* PIN DIRECTION FOR DISPLAY SPI AND GPIO */
     TRISB4 = output;                    // Active low output enables display
@@ -255,10 +255,16 @@ void SetUp(void)
     DispInit();
 
     /* INITIALIZE RADIO MODULE */
-    RFM_RST = 1;
-    gblinfo.payloadlen  = 0;
-    gblinfo.rssi_lvl    = 0;
+    RFM_RST = 1;                    //Active low reset, so bring high
+    
     tick100msDelay(5);
+    RFM_RST = 0;
+    tick100msDelay(5);
+    RFM_RST = 1;                    //Active low reset, so bring high
+    tick100msDelay(5);
+
+    // gblinfo.payloadlen  = 0;
+    // gblinfo.rssi_lvl    = 0;
     RFMInitialize( );        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
     if(!RFMsetFrequency(915.0)) {
         DispSetContrast(60);

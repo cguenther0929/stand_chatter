@@ -60,7 +60,7 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
        
     RFM_SPI_CS = 0;                    // Slave select low
-    for(i = 0; i<spidelay ; i++);       // Add a little delay
+    for(i = 0; i < spidelay ; i++);       // Add a little delay
 
     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
     
@@ -87,9 +87,9 @@ void RFMSPI2Write(uint8_t addr, uint8_t data) {
 
 void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len) {
     uint8_t i;                          // Use as a general variable
-    uint8_t rcvd_data;            // Use this to read the received data (should be done)
+    uint8_t rcvd_data;                  // Use this to read the received data (should be done)
        
-    RFM_SPI_CS = 0;                    // Slave select low
+    RFM_SPI_CS = 0;                     // Slave select low
     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
@@ -106,35 +106,35 @@ void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len) {
     while (len--) {
         WCOL2 = 0;
         SSPOV2 = 0;
-        SSP2BUF = *data++;                     // Send the instruction
-        while(BF2 != 1);                    // Wait until data is in the buffer (received)
-        rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+        SSP2BUF = *data++;              // Send the instruction
+        while(BF2 != 1);                // Wait until data is in the buffer (received)
+        rcvd_data = SSP2BUF;            // BF2 is cleared by simply  reading received data from SSBUF
     }
     
-    for(i = 0; i < spidelay ; i++);       // Add a little delay
-    RFM_SPI_CS = 1;                    // Disable the chip
+    for(i = 0; i < spidelay ; i++);     // Add a little delay
+    RFM_SPI_CS = 1;                     // Disable the chip
 }
 
-void RFMSPI2WriteByte(uint8_t data) {  
-    uint8_t i;                          // Use as a general variable
-    uint8_t rcvd_data;                  // Use this to read the received data (should be done)
+// void RFMSPI2WriteByte(uint8_t data) {  
+//     uint8_t i;                          // Use as a general variable
+//     uint8_t rcvd_data;                  // Use this to read the received data (should be done)
        
-    RFM_SPI_CS = 0;                    // Slave select low
-    for(i = 0; i<spidelay ; i++);       // Add a little delay
+//     RFM_SPI_CS = 0;                    // Slave select low
+//     for(i = 0; i<spidelay ; i++);       // Add a little delay
 
-    rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
+//     rcvd_data = SSP2BUF;                // First clean out the buffer to clean up
     
-    /* SEND THE DATA */
-    WCOL2 = 0;
-    SSPOV2 = 0;
-    SSP2BUF = data;                     // Send the instruction
+//     /* SEND THE DATA */
+//     WCOL2 = 0;
+//     SSPOV2 = 0;
+//     SSP2BUF = data;                     // Send the instruction
     
-    while(BF2 != 1);                    // Wait until data is in the buffer (received)
-    rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
+//     while(BF2 != 1);                    // Wait until data is in the buffer (received)
+//     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
 
-    for(i = 0; i < spidelay ; i++);       // Add a little delay
-    RFM_SPI_CS = 1;                    // Disable the chip
-}
+//     for(i = 0; i < spidelay ; i++);       // Add a little delay
+//     RFM_SPI_CS = 1;                    // Disable the chip
+// }
 
 uint8_t RFMSPI2Read(uint8_t addr) {  // TODO RFM is on SPI2!!!
     

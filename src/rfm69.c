@@ -26,16 +26,6 @@ Here's a link directly to the radiohead git repo https://github.com/PaulStoffreg
 
 struct GlobalInformation gblinfo;
 
-static const MODEM_CONFIG_TABLE[] =
-{
-    //  1d,     1e,      26
-    { 0x72,   0x74,    0x00}, // Bw125Cr45Sf128 (the chip default)
-    { 0x92,   0x74,    0x00}, // Bw500Cr45Sf128
-    { 0x48,   0x94,    0x00}, // Bw31_25Cr48Sf512
-    { 0x78,   0xc4,    0x00}, // Bw125Cr48Sf4096
-
-};
-
 void RFMInitialize( void ) {
 
     // These are indexed by the values of ModemConfigChoice
@@ -64,18 +54,73 @@ void RFMInitialize( void ) {
 
     // Set up default configuration
     // No Sync Words in LORA mode.
-    //setModemConfig(Bw125Cr48Sf4096); // slow and reliable?
-    RFMsetModemConfig(Bw125Cr45Sf128); // Radio default
+
+    // Define Config 1 -> Signal bandwidth of 41.7kHz (default, bits 7:4) + Error Coding rate of 4/5 (default, bits 3:1) + Explicit Header Mode (default, bit 0)
+    RFMSPI2Write(RH_RF95_REG_1D_MODEM_CONFIG1, 0x72);           
+    
+    // Define Config 2  -> Spreading factor of 7 (default, bits 7:4) + Hearder CRC set to on (bit 2)
+    RFMSPI2Write(RH_RF95_REG_1E_MODEM_CONFIG2, 0x74);
+    // RFMSPI2Write(RH_RF95_REG_1E_MODEM_CONFIG2, 0x70);        //TODO remove   // 0101 0100    -> Spreading factor of 7 (default, bits 7:4) + Hearder CRC set to on (bit 2)
+    
+    // Define Config 3 -> Set all to defaults 
+    RFMSPI2Write(RH_RF95_REG_26_MODEM_CONFIG3, 0x00);           
     
     
-    RFMsetPreambleLength(8); // Default is 8
+    // RFMsetPreambleLength(8); // Default is 8  //TODO put this back in?
     
     // An innocuous ISM frequency, same as RF22's
     RFMsetFrequency(434.0);
     
     // Lowish power
-    RFMsetTxPower(13,0);
+    RFMsetTxPower(23,0);
 
+}
+
+bool RFMsend(const char * data, uint8_t len)
+{
+    uint16_t i = 0;
+    
+    // if (len > RFM_MAX_MESSAGE_LEN) return false;
+    if (len > RFM_MAX_MESSAGE_LEN) {
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("MSG LENGTH");
+        tick100msDelay(20); 
+    } 
+
+    // Make sure we not in TX mode.  After TX radio will automatically transition into standby mode
+    while (RFMtxInProgress() && 500 > i++);   
+    
+    if(i >= 199){
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("TIMOUT IN SEND");
+        tick100msDelay(20);        
+
+    }
+    
+    RFMsetMode(RFM_MODE_IDLE);
+
+    // Position at the beginning of the FIFO
+    RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
+    
+    // The headers
+    RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);       // Enter destination address
+    RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);       // Source address
+    RFMSPI2Write(RFM_REG_00_FIFO, 0x00);                        // Header ID
+    RFMSPI2Write(RFM_REG_00_FIFO, 0x00);                        // Header flags
+    
+    // The message data
+    RFMSPI2WriteBurst(RFM_REG_00_FIFO, data, len);
+    
+    RFMSPI2Write(RH_RF95_REG_22_TX_PALD_LG, len + RFM_HEADER_LEN);
+
+    RFMsetMode(RFM_MODE_TX);    // Start the transmitter
+                                // when Tx is done, interruptHandler will fire and radio mode will return to STANDBY
+    
+    while(!RFM_IRQ_PIN);        // May want to make this interrupt driven for better operation
+
+    return true;
 }
 
 void RFMsetMode(RadioOpMode mode) {
@@ -88,7 +133,11 @@ void RFMsetMode(RadioOpMode mode) {
     switch (mode) {
         case RFM_MODE_TX:      //TODO temp updated
             RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_TX);
-	        RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x40); // Interrupt on TxDone
+	        RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x40); // Table 63. p41. Bit [7:6] 01 == Interrupt on TxDone
+            // DispSetContrast(50);
+            // DispRefresh();
+            // DispWriteString("SET MODE TX");
+            // tick100msDelay(20);
             break;
         case RFM_MODE_RX:      //TODO temp updated
             RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_RXCONTINUOUS);
@@ -102,6 +151,10 @@ void RFMsetMode(RadioOpMode mode) {
             break;
         case RFM_MODE_IDLE:        //TODO temp, updated
             RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_STDBY);
+            // DispSetContrast(50);
+            // DispRefresh();
+            // DispWriteString("SET MODE IDLE");
+            // tick100msDelay(20);  
             break;
         default:
             return;
@@ -109,65 +162,34 @@ void RFMsetMode(RadioOpMode mode) {
 
 }
 
-bool RFMsend(const char * data, uint8_t len)
-{
-    uint8_t i = 0;
-    
-    if (len > RFM_MAX_MESSAGE_LEN) return false;
-
-    //TODO do we want to insert a blocking function here that verifies we're okay 
-    // to transmit a packet. 
-    // while (RFMtxInProgress() && 50 > i++);    
-    
-    RFMsetMode(RFM_MODE_IDLE);
-
-    // Position at the beginning of the FIFO
-    RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
-    
-    // The headers
-    RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);       // Enter destination address
-    RFMSPI2Write(RFM_REG_00_FIFO, RFM_BROADCAST_ADDRESS);          // Source address
-    RFMSPI2Write(RFM_REG_00_FIFO, 0x01);                        // Header ID
-    RFMSPI2Write(RFM_REG_00_FIFO, 0x00);                        // Header flags
-    
-    // The message data
-    RFMSPI2WriteBurst(RFM_REG_00_FIFO, data, len);
-    
-    RFMSPI2Write(RH_RF95_REG_22_PAYLOAD_LENGTH, len + RFM_HEADER_LEN);
-
-    RFMsetMode(RFM_MODE_TX);    // Start the transmitter
-                                // when Tx is done, interruptHandler will fire and radio mode will return to STANDBY
-    
-    //TODO do we want to block here until IRQ flag goes high to indicate transmit is finished?
-    
-    return true;
-}
 
 // Set one of the canned FSK Modem configs
 // Returns true if its a valid choice
 bool RFMsetModemConfig(ModemConfigChoice index) {       //TODO temp note, new RH function 
-    if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
-        return false;
+    // if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
+    //     return false;
 
-    ModemConfig cfg;
-    memcpy(&cfg, &MODEM_CONFIG_TABLE[index], sizeof(ModemConfig));
+    // ModemConfig cfg;
+    // memcpy(&cfg, &MODEM_CONFIG_TABLE[index], sizeof(ModemConfig));
     
-    RFMsetModemRegisters(&cfg);
+    // RFMsetModemRegisters(&cfg);
 
     return true;
 }
 
 // Sets registers from a canned modem configuration structure
 void RFMsetModemRegisters(const ModemConfig* config) {
-    RFMSPI2Write(RH_RF95_REG_1D_MODEM_CONFIG1, config->reg_1d);
-    RFMSPI2Write(RH_RF95_REG_1E_MODEM_CONFIG2, config->reg_1e);
-    RFMSPI2Write(RH_RF95_REG_26_MODEM_CONFIG3, config->reg_26);
+    // RFMSPI2Write(RH_RF95_REG_1D_MODEM_CONFIG1, config->reg_1d);
+    // RFMSPI2Write(RH_RF95_REG_1E_MODEM_CONFIG2, config->reg_1e);
+    // RFMSPI2Write(RH_RF95_REG_26_MODEM_CONFIG3, config->reg_26);
 }
 
 bool RFMsetFrequency (float centre) {       //TODO, temp note, RH function
     
-    // Frf = FRF / FSTEP
-    uint32_t frf = (centre * 1000000.0) / RH_RF95_FSTEP;
+    //FSTEP = FXOSC / 2^19 so FSTEP = 32MHz / 524288 = 61.03515625
+    uint32_t frf = (centre * 1000000.0) / 61.03515625;          // TODO can clean this up by replacing 61.** with RH_RF95_FSTEP
+    // float frf = (centre * 1000000.0) / RH_RF95_FSTEP;
+    // frf = (uint32_t)frf;                                //Typecast to uint32
     RFMSPI2Write(RH_RF95_REG_06_FRF_MSB, (frf >> 16) & 0xff);
     RFMSPI2Write(RH_RF95_REG_07_FRF_MID, (frf >> 8) & 0xff);
     RFMSPI2Write(RH_RF95_REG_08_FRF_LSB, frf & 0xff);
@@ -180,7 +202,7 @@ void RFMsetPreambleLength(uint16_t bytes) {
     RFMSPI2Write(RH_RF95_REG_21_PREAMBLE_LSB, bytes & 0xff);
 }
 
-bool RFMtxInProgress( void ) {
+bool RFMtxInProgress( void ) {  //TODO this needs work! 
     if (gblinfo.rfmmode == RFM_MODE_TX) return true;
     return false;
 }
