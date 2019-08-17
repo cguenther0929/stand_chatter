@@ -16,7 +16,7 @@
 /*  DEFINE THE STRUCTURE USED IN THIS FILE */
 struct GlobalInformation sysinfo;
 
-void SPI1Init( void ){  // TODO copy this into CPI2Init
+void SPI1Init( void ){  
     
     /* CONFIGURE SSP1STAT REGISTER */
     SMP1 = 0;           // Input data is sampled at the middle of data output time
@@ -206,10 +206,8 @@ uint8_t SPI1Read(uint8_t addr) {
     uint8_t i;                             //Use as a general variable
     uint8_t data;        //Use this to read the received data (should be done)
     
-    RFM_SPI_CS = 0;             //Slave select low
-    for(i = 0; i < spidelay ; i++);       //Add a little delay
-
-    //TODO: need to modify the address for read operation first!! This probably needs work, in general!
+    RFM_SPI_CS = 0;                         // Slave select low
+    for(i = 0; i < spidelay ; i++);         // Add a little delay
 
     /* SEND THE ADDRESS */
     WCOL1 = 0;
@@ -222,119 +220,16 @@ uint8_t SPI1Read(uint8_t addr) {
     /* GRAB FIRST BYTE OF DATA */
     WCOL1 = 0;
     SSPOV1=0;
-    SSP1BUF = 0x55;                      //Transmit garbage to grab data
-    while(BF1 != 1);      //Wait until data is in the buffer
+    SSP1BUF = 0x55;                 // Transmit garbage to grab data
+    while(BF1 != 1);                // Wait until data is in the buffer
     data = SSP1BUF;
    
-    for(i = 0; i<spidelay ; i++);       //Add a little delay
-    RFM_SPI_CS = 1;     //Diable the chip
+    for(i = 0; i<spidelay ; i++);       // Add a little delay
+    RFM_SPI_CS = 1;                     // Diable the chip
 
     return data;    //Return the 8bits of data
 
 }
-
-// void WritePromStatus(UCHAR inst, UCHAR data) {
-//     uint8_t i;                             //Use as a general variable
-//     UCHAR rcvd_data;        //Use this to read the received data (should be done)
-
-//     RFM_SPI_CS = 0;             //Slave select low
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-
-//     /* SEND THE INSTRUCTION */
-//     WCOL1 = 0;               //Datasheet defines that we should clear these values
-//     SSPOV1=0;
-//     SSP1BUF = inst;                      //Send the instruction
-    
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-//     for(i = 0; i<200 ; i++);       //Add a little delay
-
-//     /* SEND THE DATA */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = data;                      //Send the data
-  
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-   
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RFM_SPI_CS = 1;     //Disable the chip
-// }
-
-// UCHAR PromStatus( void ) { //I think this function is good
-//     uint8_t i;                             //Use as a general variable
-//     UCHAR data;        //Use this to read the received data (should be done)
-        
-//     RFM_SPI_CS = 0;             //Slave select low
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-
-//     /* SEND THE INSTRUCTION */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = inst_RDSR;                      //Send the instruction
-
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-    
-//     /* SEND JUNK TO GET DATA */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = 0x55;                      //Send the instruction
-    
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     data = SSP1BUF;  //BF1 is cleared by simply  reading received data from SSBUF
-    
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RFM_SPI_CS = 1;     //Diable the chip
-
-//     return data;    //Return the 8bits of data
-// }
-
-// void DisableWrite( void ) {
-//     uint8_t i;             //Used as a counter
-//     UCHAR rcvd_data;        //Used to empty the SPI buffer
-//     RFM_SPI_CS = 0;             //Slave select low
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-
-//     /* SEND THE INSTRUCTION */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = inst_WRDI;                 //Send the instruction
-
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RFM_SPI_CS = 1;     //Disable the chip
-// }
-
-// void EnableWrite( void ) {
-//     uint8_t i;             //Used as a counter
-//     UCHAR rcvd_data;        //Used to empty the SPI buffer
-//     RFM_SPI_CS = 0;             //Slave select low
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-
-//     /* SEND THE INSTRUCTION */
-//     WCOL1 = 0;
-//     SSPOV1=0;
-//     SSP1BUF = inst_WREN;                 //Send the instruction
-
-//     while(BF1 != 1);      //Wait until data is in the buffer
-//     rcvd_data = SSP1BUF; //BF1 is cleared by simply  reading received data from SSBUF
-
-//     for(i = 0; i<spidelay ; i++);       //Add a little delay
-//     RFM_SPI_CS = 1;     //Disable the chip
-// }
-
-// void PromOn(void) {
-//     prompwr = 1; //Pin to provide power
-// }
-
-// void PromOff(void) {
-//     prompwr = 0;    //Pin to provide power  
-// }
 
 void SPIBurnDelay(void) {
     uint8_t i;        //Used as a counter

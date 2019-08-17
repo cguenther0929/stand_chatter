@@ -43,8 +43,6 @@
 #define BUGVER              0x01
 
 /* PROCESSOR DEFINES FOR RFM69 LoRa RADIO MODULE */
-// TODO:  how about assigning the other DIO signals?
-// TODO: how are we going to assign the SPI peripheral? Will we be clever and list it here?
 #define RFM_IRQ_PIN         LATEbits.LATE7
 #define RFM_SPI_CS          LATDbits.LATD7                      
 #define RFM_RST             LATDbits.LATD3                      
