@@ -32,7 +32,6 @@
 #include "main.h"
 
 typedef enum {
-    RFM_MODE_IDLE,    
     RFM_MODE_SLEEP,   
     RFM_MODE_STANDBY,
     RFM_MODE_RX,     
@@ -51,64 +50,59 @@ extern RadioOpMode radioopmode;
 /// introduced in later versions (though we will try to avoid it).
 /// Caution: if you are using slow packet rates and long packets with RHReliableDatagram or subclasses
 /// you may need to change the RHReliableDatagram timeout for reliable operations.
-typedef enum {
-	Bw125Cr45Sf128 = 0,	   ///< Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range
-	Bw500Cr45Sf128,	           ///< Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range
-	Bw31_25Cr48Sf512,	   ///< Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range
-	Bw125Cr48Sf4096,           ///< Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. Slow+long range
-} ModemConfigChoice;
-
-typedef struct {
-    uint8_t    reg_1d;   ///< Value for register RH_RF95_REG_1D_MODEM_CONFIG1
-    uint8_t    reg_1e;   ///< Value for register RH_RF95_REG_1E_MODEM_CONFIG2
-    uint8_t    reg_26;   ///< Value for register RH_RF95_REG_26_MODEM_CONFIG3
-} ModemConfig;
 
 void RFMInitialize( void );
 
-void RFMencrypt(const char * key);
-
 void RFMsetMode(RadioOpMode mode);
 
-void RFMSetHighPowerRegs(bool onOff);
-
-void RFMsetHighPower (bool onOff);
-
-uint8_t RFMreadTemperature(uint8_t calFactor);
-
-// int16_t RFMreadRSSI( void );
-
-bool RFMcanSend( void );
-
-// void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
-
 bool RFMsend(const char * data, uint8_t len);
+
+void GetRxData(uint8_t * rxdata);
 
 bool RFMsetFrequency (float centre);
 
 void RFMsetTxPower(int8_t power, bool useRFO);
 
-bool RFMsetModemConfig(ModemConfigChoice index);
-
-void RFMsetModemRegisters(const ModemConfig* config);
-
 void RFMsetPreambleLength(uint16_t bytes);
 
 bool RFMtxInProgress( void );
 
+bool ReceivedPacket( void );  //TODO comment: Checks to see that we're not in transmit mode, and if the RXDone Pin Is set.
+
+uint8_t RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
+
+// void RFMencrypt(const char * key);
+
+// void RFMSetHighPowerRegs(bool onOff);
+
+// uint8_t RFMreadTemperature(uint8_t calFactor);
+
+// int16_t RFMreadRSSI( void );
+
+// bool RFMcanSend( void );
+
+// void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
+
+// bool RFMsetModemConfig(ModemConfigChoice index);
+
+// void RFMsetModemRegisters(const ModemConfig* config);
+
 // This is the address that indicates a broadcast
-#define RFM_BROADCAST_ADDRESS 0xff
+#define RFM_BROADCAST_ADDRESS   0xff
+
+// For this project, this is how large we'll allow the buffer to be
+#define RECEIVE_BUFFER_SIZE     32
 
 // Max number of octets the LORA Rx/Tx FIFO can hold
-#define RFM_FIFO_SIZE 255
+#define RFM_FIFO_SIZE           255
 
 // This is the maximum number of bytes that can be carried by the LORA.
 // We use some for headers, keeping fewer for RadioHead messages
-#define RFM_MAX_PAYLOAD_LEN RFM_FIFO_SIZE
+#define RFM_MAX_PAYLOAD_LEN     RFM_FIFO_SIZE
 
 // The length of the headers we add.
 // The headers are inside the LORA's payload
-#define RFM_HEADER_LEN 4
+#define RFM_HEADER_LEN          4
 
 // This is the maximum message length that can be supported by this driver. 
 // Can be pre-defined to a smaller size (to save SRAM) prior to including this header

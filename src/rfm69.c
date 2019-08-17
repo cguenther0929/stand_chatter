@@ -48,9 +48,10 @@ void RFMInitialize( void ) {
     // We configure so that we can use the entire 256 byte FIFO for either receive
     // or transmit, but not both at the same time
     RFMSPI2Write(RH_RF95_REG_0E_FIFO_TX_BASE_ADDR, 0);
-    RFMSPI2Write(RH_RF95_REG_0F_FIFO_RX_BASE_ADDR, 0);
+    // RFMSPI2Write(RH_RF95_REG_0F_FIFO_RX_BASE_ADDR, 0);
+    RFMSPI2Write(RH_RF95_REG_0F_FIFO_RX_BASE_ADDR, 0x80);
 
-    RFMsetMode(RFM_MODE_IDLE);
+    RFMsetMode(RFM_MODE_STANDBY);
 
     // Set up default configuration
     // No Sync Words in LORA mode.
@@ -66,13 +67,16 @@ void RFMInitialize( void ) {
     RFMSPI2Write(RH_RF95_REG_26_MODEM_CONFIG3, 0x00);           
     
     
-    // RFMsetPreambleLength(8); // Default is 8  //TODO put this back in?
+    RFMsetPreambleLength(8); // Default is 8    
     
     // An innocuous ISM frequency, same as RF22's
     RFMsetFrequency(434.0);
     
     // Lowish power
     RFMsetTxPower(23,0);
+
+    // TODO added by CJG.  Not sure if we need this
+    RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
 
 }
 
@@ -99,7 +103,7 @@ bool RFMsend(const char * data, uint8_t len)
 
     }
     
-    RFMsetMode(RFM_MODE_IDLE);
+    RFMsetMode(RFM_MODE_STANDBY);
 
     // Position at the beginning of the FIFO
     RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
@@ -120,7 +124,47 @@ bool RFMsend(const char * data, uint8_t len)
     
     while(!RFM_IRQ_PIN);        // May want to make this interrupt driven for better operation
 
+    tick100msDelay(10);         //TODO only in here because we can't truck previous while loop yet
+
+    RFMsetMode(RFM_MODE_STANDBY);    // Start the transmitter
+
+
     return true;
+}
+
+void GetRxData(uint8_t * rxdata) {
+    
+    uint8_t len = RFMSPI2Read(RH_RF95_REG_13_RX_NB_BYTES);
+
+    RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, RFMSPI2Read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR));
+    RFMSPI2ReadBurst(RFM_REG_00_FIFO, rxdata, len);
+	RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
+
+    RFMsetMode(RFM_MODE_STANDBY);
+}
+
+bool ReceivedPacket( void ) {
+    uint8_t temp_data;
+    
+    if (gblinfo.rfmmode == RFM_MODE_TX) return false;
+    
+    if (!(gblinfo.rfmmode == RFM_MODE_RX)) {
+        RFMsetMode(RFM_MODE_RX);                            // If not already in RX mode, put in this mode
+        return false;
+    }
+
+    temp_data = RFMSPI2Read(RH_RF95_REG_12_IRQ_FLAGS);      // Read IRQ flags
+    
+    // DispRefresh();                                      //TODO this chunk of code is for debug only
+    // DispWriteString("IRQ REG");
+    // DispLineTwo();
+    // DispWrite8b(temp_data);
+    // tick100msDelay(10);
+    
+    if(temp_data & RH_RF95_RX_DONE && (temp_data & RH_RF95_VALID_HEADER)) return true;        //RX Done bit and valid header bits set
+
+
+    return false; 
 }
 
 void RFMsetMode(RadioOpMode mode) {
@@ -132,25 +176,23 @@ void RFMsetMode(RadioOpMode mode) {
     
     switch (mode) {
         case RFM_MODE_TX:      //TODO temp updated
-            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_TX);
+            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, (RFMSPI2Read(RH_RF95_REG_01_OP_MODE) & 0xF8) | RH_RF95_MODE_TX);
+            // RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_TX);
 	        RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x40); // Table 63. p41. Bit [7:6] 01 == Interrupt on TxDone
-            // DispSetContrast(50);
-            // DispRefresh();
-            // DispWriteString("SET MODE TX");
-            // tick100msDelay(20);
             break;
         case RFM_MODE_RX:      //TODO temp updated
-            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_RXCONTINUOUS);
-	        RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x00); // Interrupt on RxDone
+            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, (RFMSPI2Read(RH_RF95_REG_01_OP_MODE) & 0xF8) | RH_RF95_MODE_RXCONTINUOUS);
+	        RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x00); // Table 63. p41 + Reg p99: Bit [7:6] 00 == Interrupt on RxDone
             break;
-        case RFM_MODE_STANDBY:     
+        // case RFM_MODE_STANDBY:     
             // RFMSPI2Write(REG_OPMODE, (RFMSPI2Read(REG_OPMODE) & 0xE3) | RF_OPMODE_STANDBY);
             break;
-        case RFM_MODE_SLEEP:       //TODO temp note, updated
-            // RFMSPI2Write(REG_OPMODE, (RFMSPI2Read(REG_OPMODE) & 0xE3) | RF_OPMODE_SLEEP);
+        case RFM_MODE_SLEEP:       //TODO temp note, updated   1111 1MMM
+            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, (RFMSPI2Read(RH_RF95_REG_01_OP_MODE) & 0xF8) | RH_RF95_MODE_SLEEP);
             break;
-        case RFM_MODE_IDLE:        //TODO temp, updated
-            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_STDBY);
+        case RFM_MODE_STANDBY:        //TODO temp, updated
+            RFMSPI2Write(RH_RF95_REG_01_OP_MODE, (RFMSPI2Read(RH_RF95_REG_01_OP_MODE) & 0xF8) | RH_RF95_MODE_STDBY);
+	        // RFMSPI2Write(RH_RF95_REG_40_DIO_MAPPING1, 0x00);            // Interrupt on RxDone  TODO do we want this here?
             // DispSetContrast(50);
             // DispRefresh();
             // DispWriteString("SET MODE IDLE");
@@ -165,7 +207,7 @@ void RFMsetMode(RadioOpMode mode) {
 
 // Set one of the canned FSK Modem configs
 // Returns true if its a valid choice
-bool RFMsetModemConfig(ModemConfigChoice index) {       //TODO temp note, new RH function 
+// bool RFMsetModemConfig(ModemConfigChoice index) {       //TODO temp note, new RH function 
     // if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
     //     return false;
 
@@ -174,15 +216,15 @@ bool RFMsetModemConfig(ModemConfigChoice index) {       //TODO temp note, new RH
     
     // RFMsetModemRegisters(&cfg);
 
-    return true;
-}
+    // return true;
+// }
 
 // Sets registers from a canned modem configuration structure
-void RFMsetModemRegisters(const ModemConfig* config) {
+// void RFMsetModemRegisters(const ModemConfig* config) {
     // RFMSPI2Write(RH_RF95_REG_1D_MODEM_CONFIG1, config->reg_1d);
     // RFMSPI2Write(RH_RF95_REG_1E_MODEM_CONFIG2, config->reg_1e);
     // RFMSPI2Write(RH_RF95_REG_26_MODEM_CONFIG3, config->reg_26);
-}
+// }
 
 bool RFMsetFrequency (float centre) {       //TODO, temp note, RH function
     

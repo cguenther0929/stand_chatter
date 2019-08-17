@@ -85,16 +85,17 @@ struct GlobalInformation gblinfo;
 
 void main()
 {
-    // uint8_t * data;
-    uint8_t data[30];
-    uint8_t test_data;
+    uint8_t * data;
+    uint8_t rxdata[RECEIVE_BUFFER_SIZE];         //No point in making this huge as we're somewhat limited by display character size
+    uint8_t msg[16];
+    // uint8_t data[30];
+    uint8_t temp_data;
     uint8_t rfm_temp;
     uint8_t i;
     bool status;
     float battery_voltage;
     
     SetUp();
-    //test_data = SPI1Read(REG_RSSITHRESH);
     battery_voltage = GetBatteryVoltage();
 
     DispSetContrast(60);
@@ -102,26 +103,69 @@ void main()
     DispWriteString("Battery Voltage");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
-    tick100msDelay(35);
+    tick100msDelay(10);
 
-    // DispRefresh();
-    // DispWriteString("BIN Print Tst");
-    // DispLineTwo();
-    // DispWrite8b(253); 
-    // tick100msDelay(50);
+    // data = "Testing";
+    // memcpy("Test",msg,4);
+    
+    // for(i=0;i<10;i++) {
 
-    // *data = "Testing";
-    for(i=0;i<10;i++) {
-
-        DispRefresh();
-        DispWriteString("Sending message...");
-        tick100msDelay(10);
+    //     DispRefresh();
+    //     DispWriteString("Sending message...");
+    //     tick100msDelay(10);
         
-        status = RFMsend("HELLO",0x05);
-        DispRefresh();
-        DispWriteString("Done...");
-        tick100msDelay(10);
-    }    
+    //     // status = RFMsend("Test",0x04);
+    //     status = RFMsend(data,0x07);
+    //     DispRefresh();
+    //     DispWriteString("Done...");
+
+    //     tick100msDelay(10);
+    // } 
+
+    RFMsetMode(RFM_MODE_SLEEP);  // Put in sleep to clear RX buffer
+    tick100msDelay(5);
+    RFMsetMode(RFM_MODE_RX);  
+    tick100msDelay(5);
+    
+    // temp_data = RFMSPI2Read(RH_RF95_REG_01_OP_MODE);
+    // DispSetContrast(60);
+    // DispRefresh();
+    // DispWriteString("OPMODE Register");
+    // DispLineTwo();
+    // DispWrite8b(temp_data);
+    // tick100msDelay(10);
+    
+    // temp_data = RFMSPI2Read(RH_RF95_REG_40_DIO_MAPPING1);
+    // DispRefresh();
+    // DispWriteString("DIO MAP");
+    // DispLineTwo();
+    // DispWrite8b(temp_data);
+    // tick100msDelay(10);
+
+    RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF);  //Clear all IRQ flags by writing to the register
+    // RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0x00);  //Clear all IRQ flags  TODO does this need to be zero!!?
+    
+    memcpy(rxdata,0x00,RECEIVE_BUFFER_SIZE);
+    DispRefresh();
+    DispWriteString("Awaiting message");
+    tick100msDelay(5);
+    // RFMsetMode(RFM_MODE_RX);        // TODO force into RX mode here
+
+    for(i=0; i<50; i++){
+        
+        if(ReceivedPacket()){
+            GetRxData(rxdata);
+            DispRefresh();
+            tick100msDelay(5);
+            DispWriteString("Received:");
+            DispLineTwo();
+            DispWriteString(rxdata);
+            tick100msDelay(5);
+            memcpy(rxdata,0x00,RECEIVE_BUFFER_SIZE);
+        }
+        
+        tick100msDelay(1);
+    }   
 
     disp_enable = DISPLAY_OFF;
     /* END OF DEBUG CODE */

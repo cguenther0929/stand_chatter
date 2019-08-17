@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "struct.h"
 #include "isr.h"
 #include "config.h"     //Project specific header file
