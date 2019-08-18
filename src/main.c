@@ -91,27 +91,38 @@ void main()
     uint8_t rfm_temp;
     uint8_t i;
     bool status;
-    float battery_voltage;
     
     SetUp();
-    battery_voltage = GetBatteryVoltage();
+    
+    PrintSplashScreen();
 
-    DispSetContrast(60);
-    DispRefresh();
-    DispWriteString("Battery Voltage");
-    DispLineTwo();
-    DispWriteFloat(battery_voltage);
-    tick100msDelay(10);
-
+    const char * pre_loaded_message[5];
+    pre_loaded_message[0] = "This is one";
+    pre_loaded_message[1] = "This is two";
+    pre_loaded_message[2] = "This is three";
+    pre_loaded_message[3] = "This is four";
+    pre_loaded_message[4] = "This is five";
+    
+    
+    // for(i = 0; i < 5; i++) {
+    //     DispRefresh();
+    //     DispWriteString(pre_loaded_message[i]);
+    //     tick100msDelay(20);
+    // }
+    
+    
     data = "Yo Yo Dog";
     
-    for(i=0; i<10; i++) {
+    for(i=0; i<5; i++) {
 
         DispRefresh();
         DispWriteString("Sending message...");
         tick100msDelay(10);
         
-        status = RFMsend(data,0x09);
+        // status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
+        // status = RFMsend(pre_loaded_message[i],16);
+        // status = RFMsend("This is one",11);
+        status = RFMsend(data,9);
         DispRefresh();
         DispWriteString("Done...");
 
@@ -140,13 +151,13 @@ void main()
     //     tick100msDelay(10);
     // }   
 
-    disp_enable = DISPLAY_OFF;
     /* END OF DEBUG CODE */
     
     while (true) {
         if(gblinfo.flag20ms) {
             gblinfo.flag20ms = false;
-            Events20ms();
+            EvaluateButtonInputs();
+            // Events20ms();
         }
         
         if(gblinfo.flag100ms) {
@@ -164,6 +175,27 @@ void main()
             gblinfo.flag1000ms = false;
             Events1000ms();
         }
+
+        if(gblinfo.btn_both_pressed) {
+            gblinfo.btn_both_pressed = false;
+            DispRefresh();
+            DispWriteString("Both BTNs Pushed");
+            tick100msDelay(10);
+        }
+        if(gblinfo.btn_1_pressed) {
+            gblinfo.btn_1_pressed = false;
+            DispRefresh();
+            DispWriteString("BTN1 Pushed");
+            tick100msDelay(10);
+        }
+        if(gblinfo.btn_2_pressed) {
+            gblinfo.btn_2_pressed = false;
+            DispRefresh();
+            DispWriteString("BTN2 Pushed");
+            tick100msDelay(10);
+        }
+
+        disp_enable = DISPLAY_OFF;
     }
 
 }   //END Main()
@@ -320,6 +352,83 @@ float GetBatteryVoltage ( void ) {
     battery_voltage *= 1.6667;                          // Convert to account for resistor divider
     
     return (battery_voltage);
+}
+
+void PrintSplashScreen( void ) {
+    float battery_voltage = 0.0;
+    
+    DispSetContrast(60);
+    DispRefresh();
+    DispWriteString("Stand Chatter");
+    DispLineTwo();
+    DispWriteString("FW v"); DispWriteChar(MAJVER + 0x30); DispWriteChar(MINVER + 0x30); DispWriteChar(BUGVER + 0x30);
+    tick100msDelay(20);
+    
+    battery_voltage = GetBatteryVoltage();
+
+    DispRefresh();
+    DispWriteString("Battery Voltage");
+    DispLineTwo();
+    DispWriteFloat(battery_voltage);
+    tick100msDelay(10);
+}
+
+void EvaluateButtonInputs ( void ) {
+    if(PB1 == BUTTON_PUSHED && PB2 == BUTTON_PUSHED) {
+        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
+        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
+        
+        gblinfo.btn_both_press_ctr++;
+    }
+    else if(PB1 == BUTTON_PUSHED && PB2 == BUTTON_RELEASED) {
+        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+        
+        gblinfo.btn_1_press_ctr++;
+    }
+    else if(PB1 == BUTTON_RELEASED && PB2 == BUTTON_PUSHED) {
+        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+        
+        gblinfo.btn_2_press_ctr++;
+    }
+    else {
+        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
+        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+
+    }
+
+    if(gblinfo.btn_1_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_1_press_ctr = BUTTON_DEBOUNCE_TICKS;
+        
+        gblinfo.btn_1_pressed       = true;
+        
+        gblinfo.btn_2_pressed       = false;
+        gblinfo.btn_both_pressed    = false;
+    }
+    
+    else if(gblinfo.btn_2_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_2_press_ctr = BUTTON_DEBOUNCE_TICKS;
+        
+        gblinfo.btn_2_pressed       = true;
+        
+        gblinfo.btn_1_pressed       = false;
+        gblinfo.btn_both_pressed    = false;
+    }
+    
+    else if(gblinfo.btn_both_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_both_press_ctr = BUTTON_DEBOUNCE_TICKS;
+        
+        gblinfo.btn_both_pressed       = true;
+        
+        gblinfo.btn_1_pressed       = false;
+        gblinfo.btn_2_pressed    = false;
+    }
+
 }
 
 /* END OF FILE */

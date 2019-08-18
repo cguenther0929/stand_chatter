@@ -41,10 +41,15 @@ extern struct GlobalInformation         //  Structure to pass information that i
 
     /* RADIO TRANSCEIVER RELATED */
     uint8_t     rfmmode;                // Keep track of the radio's mode
-    uint8_t     payloadlen;             // Will track the length of the received payload 
-    int16_t     rssi_lvl;               // For tracking the value of the RSSI (received signal strength indicator)
-    uint8_t     OurAddress;             // Sent as source address when sending frames
-    uint8_t     DestAddress;            // Sent as source address when sending frames
+
+    /* BUTTON RELATED */
+    uint8_t     btn_1_press_ctr;
+    uint8_t     btn_2_press_ctr;
+    uint8_t     btn_both_press_ctr;
+    bool        btn_1_pressed;
+    bool        btn_2_pressed;
+    bool        btn_both_pressed;
+
 
 } GlobalInformation;
 

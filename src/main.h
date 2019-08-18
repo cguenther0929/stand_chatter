@@ -62,6 +62,10 @@ void tick20msDelay( uint16_t ticks );
 ********************************************************/
 void SetUp( void );
 
-float GetBatteryVoltage ( void );  //TODO need to comment
+float GetBatteryVoltage ( void );   // TODO need to comment
+
+void EvaluateButtonInputs ( void ); // TODO need to comment
+
+void PrintSplashScreen( void );     // TODO need to comment
 
 #endif

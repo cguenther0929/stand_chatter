@@ -85,7 +85,7 @@ void EnableInterrupts( void );
 *POSTCONDITION: Action taken on a 1ms boundary
 *RETURN: Nothing
 ********************************************************/
-void Events20ms(void);  
+// void Events20ms(void);  
 
 /********************************************************
 *FUNCTION: void Events100ms(void)

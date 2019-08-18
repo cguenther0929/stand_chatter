@@ -151,8 +151,8 @@ __interrupt (low_priority) void main_isr( void ) {
     
 } /* END void interrupt low_priority main_isr( void ) */
 
-void Events20ms(void) {                 
-}
+// void Events20ms(void) {                 
+// }
 
 void Events100ms(void) {                
     

@@ -43,22 +43,26 @@
 #define BUGVER              0x01
 
 /* PROCESSOR DEFINES FOR RFM69 LoRa RADIO MODULE */
-#define RFM_IRQ_PIN         LATEbits.LATE7
-#define RFM_SPI_CS          LATDbits.LATD7                      
-#define RFM_RST             LATDbits.LATD3                      
+#define RFM_IRQ_PIN             LATEbits.LATE7
+#define RFM_SPI_CS              LATDbits.LATD7                      
+#define RFM_RST                 LATDbits.LATD3                      
 
 /* PIN DEFINES FOR LCD SCREEN */
-#define disp_enable         LATBbits.LATB4          // Active low signal for turning on display
-#define disp_reset          LATCbits.LATC1          // Active low signal to reset the display
-#define disp_reg_sel        LATCbits.LATC0          // Register select signal. 0 = instruction, 1 = data
-#define disp_spi_cs         LATCbits.LATC2          // Display Chip Select Signal 
+#define disp_enable             LATBbits.LATB4          // Active low signal for turning on display
+#define disp_reset              LATCbits.LATC1          // Active low signal to reset the display
+#define disp_reg_sel            LATCbits.LATC0          // Register select signal. 0 = instruction, 1 = data
+#define disp_spi_cs             LATCbits.LATC2          // Display Chip Select Signal 
 
 /* DEFINES FOR LED PINS */
-#define health_led          LATBbits.LATB5          // For driving health LED  
+#define health_led              LATBbits.LATB5          // For driving health LED  
 
 /* DEFINES FOR PUSH BUTTONS */
-#define PB1                 PORTBbits.RB0           // Inputs from buttons
-#define PB2                 PORTBbits.RB1
+#define PB1                     PORTBbits.RB0           // Inputs from buttons
+#define PB2                     PORTBbits.RB1
+#define BUTTON_PUSHED           1                       // State of input when button pushed
+#define BUTTON_RELEASED         !(BUTTON_PUSHED)
+#define BUTTON_DEBOUNCE_TIME    0.140                   // Should be in increments of timer resolution (i.e. 20ms)
+#define BUTTON_DEBOUNCE_TICKS   (uint8_t)(BUTTON_DEBOUNCE_TIME/0.02)
 
 /* DEFINES FOR ANALOG SENSE */
 #define BAT_VOLTAGE_CH      0           // Analog channel for reading battery voltage

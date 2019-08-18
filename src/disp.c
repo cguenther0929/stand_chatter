@@ -70,6 +70,8 @@ void DispSetContrast(uint8_t percentage) {
     uint8_t contrast_value; 
     float flt_contrast_value; 
 
+    disp_enable = DISPLAY_ON;
+
     disp_reg_sel = 0;
     for (i=0;i<20;i++);
 
@@ -108,6 +110,8 @@ void DispLineTwo (void ) {
 
 void DispWriteChar (uint8_t c) {
     uint8_t i;
+    
+    disp_enable = DISPLAY_ON;
     
     disp_reg_sel = 1;
     for (i=0;i<50;i++);
