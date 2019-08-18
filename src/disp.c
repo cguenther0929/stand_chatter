@@ -130,6 +130,20 @@ void DispWriteString(const char * y) {
 
 }
 
+void PrintDecimalNumber (uint16_t number) {
+    char temphex[5];        //Define the array that will hold the ASCII values
+    uint8_t i;                //Use this as a counter
+    uint8_t decimal_count;    //This is how many digits are written
+
+    /* USE SPRINT F TO BUILD THE ARRAY OF ASCII CHARACTERS */
+    decimal_count = sprintf(temphex, "%u", number); //u tells the function we want an unsigned decimal number
+
+    for(i = 0; i < decimal_count; i++) {    //Print out the array of ASCII characters.
+        DispWriteChar(temphex[i]);
+    }
+
+}
+
 void DispWriteFloat (float number) {
     char temphex[8];        //Define the array that will hold the ASCII values
     uint8_t i;                //Use this as a counter

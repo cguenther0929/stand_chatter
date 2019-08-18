@@ -52,6 +52,8 @@ void DispRefresh( void );
 
 void DispWriteFloat (float number);
 
+void PrintDecimalNumber (uint16_t number);
+
 void DispWrite8b (uint8_t number);
 
 #endif

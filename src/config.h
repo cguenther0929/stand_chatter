@@ -42,6 +42,9 @@
 #define MINVER              0x00
 #define BUGVER              0x01
 
+/* DEFINITIONS FOR MESSAGES */
+#define NUM_MESSAGES        5
+
 /* PROCESSOR DEFINES FOR RFM69 LoRa RADIO MODULE */
 #define RFM_IRQ_PIN             LATEbits.LATE7
 #define RFM_SPI_CS              LATDbits.LATD7                      

@@ -96,22 +96,24 @@ void main()
     
     PrintSplashScreen();
 
-    const char * pre_loaded_message[5];
-    pre_loaded_message[0] = "This is one";
-    pre_loaded_message[1] = "This is two";
-    pre_loaded_message[2] = "This is three";
-    pre_loaded_message[3] = "This is four";
-    pre_loaded_message[4] = "This is five";
+    char pre_loaded_message[NUM_MESSAGES][16];
+    strcpy(pre_loaded_message[0], "Seeing anything?");
+    strcpy(pre_loaded_message[1], "I'm surrounded");
+    strcpy(pre_loaded_message[2], "Did you shoot?");
+    strcpy(pre_loaded_message[3], "How's the beer?");
+    strcpy(pre_loaded_message[4], "Just bagged one!");
     
     
     // for(i = 0; i < 5; i++) {
     //     DispRefresh();
     //     DispWriteString(pre_loaded_message[i]);
+    //     DispLineTwo();
+    //     PrintDecimalNumber(sizeof(pre_loaded_message[i]));
     //     tick100msDelay(20);
     // }
     
     
-    data = "Yo Yo Dog";
+    // data = "Yo Yo Dog";
     
     for(i=0; i<5; i++) {
 
@@ -119,10 +121,7 @@ void main()
         DispWriteString("Sending message...");
         tick100msDelay(10);
         
-        // status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
-        // status = RFMsend(pre_loaded_message[i],16);
-        // status = RFMsend("This is one",11);
-        status = RFMsend(data,9);
+        status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
         DispRefresh();
         DispWriteString("Done...");
 
