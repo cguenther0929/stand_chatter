@@ -8756,7 +8756,7 @@ typedef union {
     };
     struct {
         unsigned                        :2;
-        unsigned PB2                    :1;
+        unsigned PB_RT_PIN                    :1;
     };
     struct {
         unsigned                        :4;
@@ -19479,7 +19479,7 @@ extern volatile __bit                   PA3                 @ (((unsigned) &PORT
 #define                                 PA3_bit             BANKMASK(PORTG), 0
 extern volatile __bit                   PB1E                @ (((unsigned) &PORTE)*8) + 6;
 #define                                 PB1E_bit            BANKMASK(PORTE), 6
-extern volatile __bit                   PB2                 @ (((unsigned) &PORTE)*8) + 2;
+extern volatile __bit                   PB_RT_PIN                 @ (((unsigned) &PORTE)*8) + 2;
 #define                                 PB2_bit             BANKMASK(PORTE), 2
 extern volatile __bit                   PB3E                @ (((unsigned) &PORTE)*8) + 4;
 #define                                 PB3E_bit            BANKMASK(PORTE), 4

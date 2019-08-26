@@ -31,6 +31,16 @@
 #include "disp.h"
 #include "adc.h"
 
+typedef enum {
+    STATE_IDLE_DISP,                    // Idle state with dispaly on -- RX Continuous
+    STATE_IDLE_NO_DISP,                 // Idle state with display off -- RX Continuous
+    STATE_SELECT_RECIPENTS,             // Scrolling through a list of possible recipents 
+    STATE_SELECT_MSG,                   // Scrolling through list of possible messages
+    STATE_CONFIRM_MSG,                   // Confirm message to send
+    STATE_TRANSMIT_MSG                  // Transmitting message  
+} CurrentState;
+
+//extern CurrentState;
 
 /********************************************************
 *FUNCTION: void tick100msDelay( uint16_t ticks )
@@ -65,7 +75,11 @@ void SetUp( void );
 
 float GetBatteryVoltage ( void );   // TODO need to comment
 
+void EvaluateState(  char pre_loaded_message[NUM_MESSAGES][16], const char * rxdata );  // TODO need to comment
+
 void EvaluateButtonInputs ( void ); // TODO need to comment
+
+void DisplayDwellTmr( bool reset );  // TODO need to comment
 
 void PrintSplashScreen( void );     // TODO need to comment
 

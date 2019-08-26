@@ -25,8 +25,6 @@
 #include <string.h>
 #include "struct.h"
 #include "config.h"     //Project specific header file
-#include "config.h"
-#include "rfm69.h"
 #include "spi.h"
 #include "disp.h"
 #include "main.h"
@@ -38,18 +36,7 @@ typedef enum {
     RFM_MODE_TX     
 } RadioOpMode;
 
-extern RadioOpMode radioopmode;
-
-/// Choices for setModemConfig() for a selected subset of common
-/// data rates. If you need another configuration,
-/// determine the necessary settings and call setModemRegisters() with your
-/// desired settings. It might be helpful to use the LoRa calculator mentioned in 
-/// http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf
-/// These are indexes into MODEM_CONFIG_TABLE. We strongly recommend you use these symbolic
-/// definitions and not their integer equivalents: its possible that new values will be
-/// introduced in later versions (though we will try to avoid it).
-/// Caution: if you are using slow packet rates and long packets with RHReliableDatagram or subclasses
-/// you may need to change the RHReliableDatagram timeout for reliable operations.
+//extern RadioOpMode;
 
 void RFMInitialize( void );
 
@@ -70,22 +57,6 @@ bool RFMtxInProgress( void );
 bool ReceivedPacket( void );  //TODO comment: Checks to see that we're not in transmit mode, and if the RXDone Pin Is set.
 
 uint8_t RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
-
-// void RFMencrypt(const char * key);
-
-// void RFMSetHighPowerRegs(bool onOff);
-
-// uint8_t RFMreadTemperature(uint8_t calFactor);
-
-// int16_t RFMreadRSSI( void );
-
-// bool RFMcanSend( void );
-
-// void RFMSend(uint16_t toAddress, const void* buffer, uint8_t bufferSize);
-
-// bool RFMsetModemConfig(ModemConfigChoice index);
-
-// void RFMsetModemRegisters(const ModemConfig* config);
 
 // This is the address that indicates a broadcast
 #define RFM_BROADCAST_ADDRESS   0xff

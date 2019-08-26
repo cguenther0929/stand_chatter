@@ -118,23 +118,22 @@ bool RFMsend(const char * data, uint8_t len)
     
     // while(!RFM_IRQ_PIN);        // This pin doesn't function as described in the datasheet 
 
-    // i = 0;
-    // while(true && 20 > i++){
-    //     temp_data = RFMSPI2Read(RH_RF95_REG_12_IRQ_FLAGS);      // Read IRQ flags
-    //     if(temp_data & RH_RF95_TX_DONE) break;
-    //     tick100msDelay(1);         
-    // }
+    i = 0;
+    while(true && 20 > i++){
+        temp_data = RFMSPI2Read(RH_RF95_REG_12_IRQ_FLAGS);      // Read IRQ flags
+        if(temp_data & RH_RF95_TX_DONE) break;
+        tick100msDelay(1);         
+    }
     
-    // tick20msDelay(5);              // Likely not needed, but small delay for mode settle
     
-    // if(i >= 20){
-    //     DispSetContrast(50);
-    //     DispRefresh();
-    //     DispWriteString("TMOU FOR TXDONE");
-    //     tick20msDelay(20);        
+    if(i >= 20){
+        DispSetContrast(50);
+        DispRefresh();
+        DispWriteString("TMOU FOR TXDONE");
+        tick20msDelay(20);        
 
-    // }
-
+    }
+    
     RFMsetMode(RFM_MODE_STANDBY);    // Just a precaution, as the module should transition automatically 
 
 	RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags

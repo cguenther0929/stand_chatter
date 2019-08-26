@@ -96,7 +96,7 @@ void EnableInterrupts( void );
 *POSTCONDITION: Action taken on a 100ms boundary
 *RETURN: Nothing
 ********************************************************/
-void Events100ms(void); 
+// void Events100ms(void); 
 
 /********************************************************
 *FUNCTION: void Events500ms(void)
@@ -107,7 +107,7 @@ void Events100ms(void);
 *POSTCONDITION: Action taken on a 500ms periodicity
 *RETURN: Nothing
 ********************************************************/
-void Events500ms(void);
+// void Events500ms(void);
 
 /********************************************************
 *FUNCTION: void Events1000ms(void)
@@ -117,7 +117,7 @@ void Events500ms(void);
 *POSTCONDITION: Action taken on a 1000ms boundary
 *RETURN: Nothing
 ********************************************************/
-void Events1000ms(void);       
+// void Events1000ms(void);       
 
 /********************************************************
 *FUNCTION: void PORTBINTSetup( uint8_t channel )

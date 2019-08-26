@@ -154,17 +154,17 @@ __interrupt (low_priority) void main_isr( void ) {
 // void Events20ms(void) {                 
 // }
 
-void Events100ms(void) {                
+// void Events100ms(void) {                
     
-}
+// }
 
-void Events500ms(void) {                
+// void Events500ms(void) {                
     
-}
+// }
 
-void Events1000ms(void) {
-    health_led = ~health_led;
-}
+// void Events1000ms(void) {
+    
+// }
 
 
 void DisableInterrupts( void ) {

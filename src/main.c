@@ -96,12 +96,18 @@ void main()
     
     PrintSplashScreen();
 
+    uint8_t msg_order = 0;
     char pre_loaded_message[NUM_MESSAGES][16];
-    strcpy(pre_loaded_message[0], "Seeing anything?");
-    strcpy(pre_loaded_message[1], "I'm surrounded");
-    strcpy(pre_loaded_message[2], "Did you shoot?");
-    strcpy(pre_loaded_message[3], "How's the beer?");
-    strcpy(pre_loaded_message[4], "Just bagged one!");
+    strcpy(pre_loaded_message[msg_order++], "Seeing anything?");
+    strcpy(pre_loaded_message[msg_order++], "I'm surrounded");
+    strcpy(pre_loaded_message[msg_order++], "Did you shoot?");
+    strcpy(pre_loaded_message[msg_order++], "Need help, man?");
+    strcpy(pre_loaded_message[msg_order++], "Yes, need help.");
+    strcpy(pre_loaded_message[msg_order++], "Just bagged one!");
+    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");
+    strcpy(pre_loaded_message[msg_order++], "On the way down.");
+    strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");
+    strcpy(pre_loaded_message[msg_order++], "Ignore prev msg!");
     
     
     // for(i = 0; i < 5; i++) {
@@ -115,18 +121,18 @@ void main()
     
     // data = "Yo Yo Dog";
     
-    for(i=0; i<5; i++) {
+    // for(i=0; i < NUM_MESSAGES; i++) {
 
-        DispRefresh();
-        DispWriteString("Sending message...");
-        tick100msDelay(10);
+    //     DispRefresh();
+    //     DispWriteString("Sending message...");
+    //     tick100msDelay(10);
         
-        status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
-        DispRefresh();
-        DispWriteString("Done...");
+    //     status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
+    //     DispRefresh();
+    //     DispWriteString("Done...");
 
-        tick100msDelay(10);
-    } 
+    //     tick100msDelay(10);
+    // } 
 
     
     // memcpy(rxdata,0x00,RECEIVE_BUFFER_SIZE);
@@ -156,48 +162,339 @@ void main()
         if(gblinfo.flag20ms) {
             gblinfo.flag20ms = false;
             EvaluateButtonInputs();
-            // Events20ms();
+            EvaluateState(pre_loaded_message,rxdata);
         }
         
         if(gblinfo.flag100ms) {
             gblinfo.flag100ms = false;
-            Events100ms();
+            (gblinfo.splash_screen_tmr_active)?(gblinfo.splash_screen_tmr++):(gblinfo.splash_screen_tmr=0);
         }
 
         if(gblinfo.flag500ms) {
             gblinfo.flag100ms = false;
-            Events500ms();
         }
 
 
         if(gblinfo.flag1000ms) {
             gblinfo.flag1000ms = false;
-            Events1000ms();
+            DisplayDwellTmr(0);
+            health_led = ~health_led;
         }
 
-        if(gblinfo.btn_both_pressed) {
-            gblinfo.btn_both_pressed = false;
-            DispRefresh();
-            DispWriteString("Both BTNs Pushed");
-            tick100msDelay(10);
-        }
-        if(gblinfo.btn_1_pressed) {
-            gblinfo.btn_1_pressed = false;
-            DispRefresh();
-            DispWriteString("BTN1 Pushed");
-            tick100msDelay(10);
-        }
-        if(gblinfo.btn_2_pressed) {
-            gblinfo.btn_2_pressed = false;
-            DispRefresh();
-            DispWriteString("BTN2 Pushed");
-            tick100msDelay(10);
-        }
+        // if(gblinfo.btn_both_pressed) {
+        //     gblinfo.btn_both_pressed = false;
+        //     DispRefresh();
+        //     DispWriteString("Both BTNs Pushed");
+        //     tick100msDelay(10);
+        // }
+        // if(gblinfo.btn_lt_pressed) {
+        //     gblinfo.btn_lt_pressed = false;
+        //     DispRefresh();
+        //     DispWriteString("BTN1 Pushed");
+        //     tick100msDelay(10);
+        // }
+        // if(gblinfo.btn_rt_pressed) {
+        //     gblinfo.btn_rt_pressed = false;
+        //     DispRefresh();
+        //     DispWriteString("BTN2 Pushed");
+        //     tick100msDelay(10);
+        // }
 
-        disp_enable = DISPLAY_OFF;
+        // disp_enable = DISPLAY_OFF;
     }
 
 }   //END Main()
+
+
+void tick100msDelay(uint16_t ticks)
+{
+    uint16_t i = 0;
+    uint16_t tick = 0; //Used to lock time value
+    for (i = ticks; i > 0; i--)
+    {
+        tick = gblinfo.tick100ms;
+        while (tick == gblinfo.tick100ms); //Wait for time to wrap around (in one half tick1000mond)
+    }
+}
+
+void tick20msDelay(uint16_t ticks)  
+{
+    uint16_t i = 0;
+    uint16_t tick = 0; //Used to lock time value
+    for (i = ticks; i > 0; i--)
+    {
+        tick = gblinfo.tick20ms;
+        while (tick == gblinfo.tick20ms); //Wait for time to wrap around (in one half tick1000mond)
+    }
+}
+
+float GetBatteryVoltage ( void ) {
+    float battery_voltage;
+    battery_voltage = ReadA2D(BAT_VOLTAGE_CH,1);
+    battery_voltage = battery_voltage * (2.048/4096);
+    battery_voltage *= 1.6667;                          // Convert to account for resistor divider
+    
+    return (battery_voltage);
+}
+
+void PrintSplashScreen( void ) {
+    float battery_voltage = 0.0;
+    
+    DispSetContrast(60);
+    DispRefresh();
+    DispWriteString("Stand Chatter");
+    DispLineTwo();
+    DispWriteString("FW v"); DispWriteChar(MAJVER + 0x30); DispWriteChar(MINVER + 0x30); DispWriteChar(BUGVER + 0x30);
+    tick100msDelay(20);
+    
+    battery_voltage = GetBatteryVoltage();
+
+    DispRefresh();
+    DispWriteString("Battery Voltage");
+    DispLineTwo();
+    DispWriteFloat(battery_voltage);
+    tick100msDelay(10);
+
+    DispRefresh();
+    DispWriteString("Waiting for");
+    DispLineTwo();
+    DispWriteString("message");
+
+}
+
+void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxdata ) {
+    switch(gblinfo.current_state) {
+        // TODO add code that checks to see if we have a new message
+        case STATE_IDLE_DISP:
+            
+            if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+            }
+            
+            else if((gblinfo.btn_lt_pressed) && (disp_enable == DISPLAY_ON)) {
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                
+                DisplayDwellTmr(1);         // Send one to reset the counter
+                
+                // Transition into display send-able messages 
+                gblinfo.msg_to_send = 0;
+                DispSetContrast(60);
+                DispRefresh();
+                DispWriteString("SEND");
+                DispLineTwo();
+                DispWriteString(pre_loaded_message[gblinfo.msg_to_send]);
+
+
+                gblinfo.current_state = STATE_SELECT_MSG;
+            }
+
+            else if((gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed ) && (disp_enable == DISPLAY_ON)) {
+                DisplayDwellTmr(1);         // Send one to reset the counter
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+            }
+
+            if(gblinfo.disp_seconds_ctr > MAX_DISP_DWELL) {
+                disp_enable = DISPLAY_OFF;
+            }
+            break;
+
+        case STATE_SELECT_MSG:
+            
+            if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+            }
+            
+            else if(gblinfo.btn_both_pressed && (disp_enable == DISPLAY_ON)) {          
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+
+                // Transition to idle state and dispaly last received message
+                gblinfo.msg_to_send = 0;
+                DispSetContrast(60);
+                DispRefresh();
+                DispWriteString("LAST RECEIVED");
+                DispLineTwo();
+                DispWriteString(rxdata);
+                
+                gblinfo.current_state = STATE_IDLE_DISP;
+            }
+            
+            else if ((gblinfo.btn_lt_pressed) && (disp_enable == DISPLAY_ON)) {
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+                
+                (gblinfo.msg_to_send >= NUM_MESSAGES)?(gblinfo.msg_to_send = 0):(gblinfo.msg_to_send++);
+                DispLineTwo();
+                DispWriteString(pre_loaded_message[gblinfo.msg_to_send]);
+
+            }
+            
+            else if ((gblinfo.btn_rt_pressed) && (disp_enable == DISPLAY_ON)) {
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+                
+                // Transition to confirming sending message
+                DispCursorHome();
+                DispWriteString("Confirm Sending?");            // Selected message should still be on line two
+                gblinfo.current_state = STATE_CONFIRM_MSG;
+
+
+            }
+            break;
+        
+        case STATE_CONFIRM_MSG:          //TODO stopped here 8/21/19
+            if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+            }
+            
+            else if(gblinfo.btn_both_pressed && (disp_enable == DISPLAY_ON)) {      // User wishes to cancel sending 
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+
+                // Transition to idle state and dispaly last received message
+                gblinfo.msg_to_send = 0;
+                DispSetContrast(60);
+                DispRefresh();
+                DispWriteString("LAST RECEIVED");
+                DispLineTwo();
+                DispWriteString(rxdata);
+                
+                gblinfo.current_state = STATE_IDLE_DISP;
+            }
+            
+            else if(gblinfo.btn_lt_pressed && (disp_enable == DISPLAY_ON)) {      // Do nothing, but wake display 
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+            }
+            
+            else if ((gblinfo.btn_rt_pressed) && (disp_enable == DISPLAY_ON)) {     // User confirms to send message
+                gblinfo.btn_lt_pressed       = false;
+                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_both_pressed    = false;
+                DisplayDwellTmr(1);         // Send one to reset the counter
+                
+                // Transition to confirming sending message
+                DispCursorHome();
+                DispWriteString("Sending...      ");                                      // Selected message should still be on line two
+                gblinfo.splash_screen_tmr_active = true;
+                gblinfo.current_state = STATE_TRANSMIT_MSG;
+                RFMsend(pre_loaded_message[gblinfo.msg_to_send],sizeof(pre_loaded_message[gblinfo.msg_to_send]));
+            }
+            
+            break;
+
+            case STATE_TRANSMIT_MSG:
+                if(gblinfo.splash_screen_tmr >= SPLASH_SCREEN_DWELL) {
+                    gblinfo.current_state = STATE_IDLE_DISP;
+                    gblinfo.splash_screen_tmr_active = false;
+                    gblinfo.msg_to_send = 0;
+                    DispRefresh();
+                    DispWriteString("LAST RECEIVED:");
+                    DispLineTwo();
+                    DispWriteString(rxdata);
+                }
+                
+                break;
+    }
+
+}
+
+void DisplayDwellTmr( bool reset ) {
+    
+    if(reset) {
+        disp_enable = DISPLAY_ON;
+        gblinfo.disp_seconds_ctr = 0;
+    }
+    
+    else {
+        if(gblinfo.disp_tmr_active && gblinfo.disp_seconds_ctr < MAX_DISP_DWELL) 
+            gblinfo.disp_seconds_ctr++;
+        else if (!gblinfo.disp_tmr_active)
+            gblinfo.disp_seconds_ctr = 0;
+    }
+
+}
+
+void EvaluateButtonInputs ( void ) {
+    if(PB_LT_PIN == BUTTON_PUSHED && PB_RT_PIN == BUTTON_PUSHED) {
+        (gblinfo.btn_lt_press_ctr > 2)?(gblinfo.btn_lt_press_ctr -= 2):(gblinfo.btn_lt_press_ctr = 0);
+        (gblinfo.btn_rt_press_ctr > 2)?(gblinfo.btn_rt_press_ctr -= 2):(gblinfo.btn_rt_press_ctr = 0);
+        
+        gblinfo.btn_both_press_ctr++;
+    }
+    else if(PB_LT_PIN == BUTTON_PUSHED && PB_RT_PIN == BUTTON_RELEASED) {
+        (gblinfo.btn_rt_press_ctr > 2)?(gblinfo.btn_rt_press_ctr -= 2):(gblinfo.btn_rt_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+        
+        gblinfo.btn_lt_press_ctr++;
+    }
+    else if(PB_LT_PIN == BUTTON_RELEASED && PB_RT_PIN == BUTTON_PUSHED) {
+        (gblinfo.btn_lt_press_ctr > 2)?(gblinfo.btn_lt_press_ctr -= 2):(gblinfo.btn_lt_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+        
+        gblinfo.btn_rt_press_ctr++;
+    }
+    else {
+        (gblinfo.btn_lt_press_ctr > 2)?(gblinfo.btn_lt_press_ctr -= 2):(gblinfo.btn_lt_press_ctr = 0);
+        (gblinfo.btn_rt_press_ctr > 2)?(gblinfo.btn_rt_press_ctr -= 2):(gblinfo.btn_rt_press_ctr = 0);
+        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
+
+    }
+
+    if(gblinfo.btn_lt_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_lt_press_ctr = 0;
+        
+        gblinfo.btn_lt_pressed       = true;
+        
+        gblinfo.btn_rt_pressed       = false;
+        gblinfo.btn_both_pressed    = false;
+    }
+    
+    else if(gblinfo.btn_rt_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_rt_press_ctr = 0;
+        
+        gblinfo.btn_rt_pressed       = true;
+        
+        gblinfo.btn_lt_pressed       = false;
+        gblinfo.btn_both_pressed    = false;
+    }
+    
+    else if(gblinfo.btn_both_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
+        
+        gblinfo.btn_both_press_ctr = 0;
+        
+        gblinfo.btn_both_pressed    = true;
+        
+        gblinfo.btn_lt_pressed       = false;
+        gblinfo.btn_rt_pressed       = false;
+    }
+
+}
 
 void SetUp(void)
 {
@@ -267,18 +564,26 @@ void SetUp(void)
     TRISD1 = output;
     TRISD0 = output;
 
+    /* SELECT CURRENT OPERATION STATE */
+    gblinfo.current_state               = STATE_IDLE_DISP;
+    gblinfo.disp_seconds_ctr            = 0;
+    gblinfo.msg_to_send                 = 0;
+    gblinfo.disp_tmr_active             = false;
+    gblinfo.splash_screen_tmr_active    = false;
+
     /* INITIAL CONDITION OF HEALTH LED */
     health_led = LED_OFF;
 
     /* TURN OFF THE DISPLAY */
     disp_enable = DISPLAY_OFF;
 
-    Init_Interrupts();                          // Set up interrupts  
+    /* SETUP INTERRUPTS */
+    Init_Interrupts();   
 
     /* INITIALIZE SPI INTERFACE FOR DISPLAY */
     SPI1Init();
 
-    /* INITIALIZE SPI INTERFACE FOR DISPLAY */
+    /* INITIALIZE SPI INTERFACE FOR RADIO MODULE */
     SPI2Init();
 
     AnalogRefSel(REF2D048, EXTREF);             // Use internal 2.048V reference and External VREF pin for negative reference -- page 216/380
@@ -289,10 +594,10 @@ void SetUp(void)
     ANCON1 = 0x00;                      // Analog channel 10-8 are configred for digital inputs. p.364
     EnableAnalogCh(BAT_VOLTAGE_CH);     // Channel for battery voltage level
     
-    gblinfo.tick20ms = 0;       // Initialize 10ms tick counter
-    gblinfo.tick100ms = 0;      // Initialize 100ms tick counter 
-    gblinfo.tick500ms = 0;      // Initialize 500ms tick counter
-    gblinfo.tick1000ms = 0;     // Initialize 1000ms tick counter
+    gblinfo.tick20ms = 0;               // Initialize 10ms tick counter
+    gblinfo.tick100ms = 0;              // Initialize 100ms tick counter 
+    gblinfo.tick500ms = 0;              // Initialize 500ms tick counter
+    gblinfo.tick1000ms = 0;             // Initialize 1000ms tick counter
 
     /* TIMER FOR APPLICATION INTERRUPTS */
     Timer0Init(TMR0_INTUP_SETTING, TMR0_PRESCALER, 0); //ARGS: interrupts = yes, prescaler = 2, clksource = FOSC/4
@@ -304,15 +609,12 @@ void SetUp(void)
 
     /* INITIALIZE RADIO MODULE */
     RFM_RST = 1;                    //Active low reset, so bring high
-    
     tick100msDelay(5);
     RFM_RST = 0;
     tick100msDelay(5);
     RFM_RST = 1;                    //Active low reset, so bring high
     tick100msDelay(5);
 
-    // gblinfo.payloadlen  = 0;
-    // gblinfo.rssi_lvl    = 0;
     RFMInitialize( );        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
     if(!RFMsetFrequency(915.0)) {
         DispSetContrast(60);
@@ -321,113 +623,4 @@ void SetUp(void)
         tick100msDelay(35);
     }
 }
-
-void tick100msDelay(uint16_t ticks)
-{
-    uint16_t i = 0;
-    uint16_t tick = 0; //Used to lock time value
-    for (i = ticks; i > 0; i--)
-    {
-        tick = gblinfo.tick100ms;
-        while (tick == gblinfo.tick100ms); //Wait for time to wrap around (in one half tick1000mond)
-    }
-}
-
-void tick20msDelay(uint16_t ticks)  
-{
-    uint16_t i = 0;
-    uint16_t tick = 0; //Used to lock time value
-    for (i = ticks; i > 0; i--)
-    {
-        tick = gblinfo.tick20ms;
-        while (tick == gblinfo.tick20ms); //Wait for time to wrap around (in one half tick1000mond)
-    }
-}
-
-float GetBatteryVoltage ( void ) {
-    float battery_voltage;
-    battery_voltage = ReadA2D(BAT_VOLTAGE_CH,1);
-    battery_voltage = battery_voltage * (2.048/4096);
-    battery_voltage *= 1.6667;                          // Convert to account for resistor divider
-    
-    return (battery_voltage);
-}
-
-void PrintSplashScreen( void ) {
-    float battery_voltage = 0.0;
-    
-    DispSetContrast(60);
-    DispRefresh();
-    DispWriteString("Stand Chatter");
-    DispLineTwo();
-    DispWriteString("FW v"); DispWriteChar(MAJVER + 0x30); DispWriteChar(MINVER + 0x30); DispWriteChar(BUGVER + 0x30);
-    tick100msDelay(20);
-    
-    battery_voltage = GetBatteryVoltage();
-
-    DispRefresh();
-    DispWriteString("Battery Voltage");
-    DispLineTwo();
-    DispWriteFloat(battery_voltage);
-    tick100msDelay(10);
-}
-
-void EvaluateButtonInputs ( void ) {
-    if(PB1 == BUTTON_PUSHED && PB2 == BUTTON_PUSHED) {
-        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
-        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
-        
-        gblinfo.btn_both_press_ctr++;
-    }
-    else if(PB1 == BUTTON_PUSHED && PB2 == BUTTON_RELEASED) {
-        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
-        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
-        
-        gblinfo.btn_1_press_ctr++;
-    }
-    else if(PB1 == BUTTON_RELEASED && PB2 == BUTTON_PUSHED) {
-        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
-        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
-        
-        gblinfo.btn_2_press_ctr++;
-    }
-    else {
-        (gblinfo.btn_1_press_ctr > 2)?(gblinfo.btn_1_press_ctr -= 2):(gblinfo.btn_1_press_ctr = 0);
-        (gblinfo.btn_2_press_ctr > 2)?(gblinfo.btn_2_press_ctr -= 2):(gblinfo.btn_2_press_ctr = 0);
-        (gblinfo.btn_both_press_ctr > 2)?(gblinfo.btn_both_press_ctr -= 2):(gblinfo.btn_both_press_ctr = 0);
-
-    }
-
-    if(gblinfo.btn_1_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
-        
-        gblinfo.btn_1_press_ctr = BUTTON_DEBOUNCE_TICKS;
-        
-        gblinfo.btn_1_pressed       = true;
-        
-        gblinfo.btn_2_pressed       = false;
-        gblinfo.btn_both_pressed    = false;
-    }
-    
-    else if(gblinfo.btn_2_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
-        
-        gblinfo.btn_2_press_ctr = BUTTON_DEBOUNCE_TICKS;
-        
-        gblinfo.btn_2_pressed       = true;
-        
-        gblinfo.btn_1_pressed       = false;
-        gblinfo.btn_both_pressed    = false;
-    }
-    
-    else if(gblinfo.btn_both_press_ctr >= BUTTON_DEBOUNCE_TICKS) {
-        
-        gblinfo.btn_both_press_ctr = BUTTON_DEBOUNCE_TICKS;
-        
-        gblinfo.btn_both_pressed       = true;
-        
-        gblinfo.btn_1_pressed       = false;
-        gblinfo.btn_2_pressed    = false;
-    }
-
-}
-
 /* END OF FILE */

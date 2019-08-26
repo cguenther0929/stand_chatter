@@ -24,7 +24,6 @@
 #include <xc.h>
 
 /* PREPROCESSOR CALCULATION TO DETERMINE TIMER4'S INCREMENT RATE */
-// #define MCU_OSC_FRQ         16000000.0                  // Oscillator used for MCU
 #define MCU_OSC_FRQ         8000000.0                  // Oscillator used for MCU
 #define OSC_DIV4            (MCU_OSC_FRQ/4.0)           // Oscillator used for MCU
 
@@ -43,7 +42,11 @@
 #define BUGVER              0x01
 
 /* DEFINITIONS FOR MESSAGES */
-#define NUM_MESSAGES        5
+#define NUM_MESSAGES        10
+
+/* DEFINITIONS RELATED TO DISPLAY */
+#define MAX_DISP_DWELL          5                           // Max amount of time (in seconds) display is allowed to be ON
+#define SPLASH_SCREEN_DWELL     500                         // Amount of time (in one hundred mili-second) a temp message is allowed to display
 
 /* PROCESSOR DEFINES FOR RFM69 LoRa RADIO MODULE */
 #define RFM_IRQ_PIN             LATEbits.LATE7
@@ -60,8 +63,8 @@
 #define health_led              LATBbits.LATB5          // For driving health LED  
 
 /* DEFINES FOR PUSH BUTTONS */
-#define PB1                     PORTBbits.RB0           // Inputs from buttons
-#define PB2                     PORTBbits.RB1
+#define PB_LT_PIN               PORTBbits.RB0           // Inputs from buttons
+#define PB_RT_PIN               PORTBbits.RB1
 #define BUTTON_PUSHED           1                       // State of input when button pushed
 #define BUTTON_RELEASED         !(BUTTON_PUSHED)
 #define BUTTON_DEBOUNCE_TIME    0.140                   // Should be in increments of timer resolution (i.e. 20ms)
