@@ -46,7 +46,7 @@
 
 /* DEFINITIONS RELATED TO DISPLAY */
 #define MAX_DISP_DWELL          5                           // Max amount of time (in seconds) display is allowed to be ON
-#define SPLASH_SCREEN_DWELL     500                         // Amount of time (in one hundred mili-second) a temp message is allowed to display
+#define SPLASH_SCREEN_DWELL     5                           // Amount of time (in one hundred mili-second) a temp message is allowed to display
 
 /* PROCESSOR DEFINES FOR RFM69 LoRa RADIO MODULE */
 #define RFM_IRQ_PIN             LATEbits.LATE7

@@ -86,7 +86,7 @@ struct GlobalInformation gblinfo;
 void main()
 {
     uint8_t * data;
-    uint8_t rxdata[RECEIVE_BUFFER_SIZE];         //No point in making this huge as we're somewhat limited by display character size
+    uint8_t rxdata[RECEIVE_BUFFER_SIZE];         // No point in making this huge as we're somewhat limited by display character size
     uint8_t temp_data;
     uint8_t rfm_temp;
     uint8_t i;
@@ -96,67 +96,23 @@ void main()
     
     PrintSplashScreen();
 
+    //TODO the following is just for testing!
+    strcpy(rxdata[0],"Hello World");
+
+    gblinfo.disp_tmr_active = true;             // Begin the timer to kill display after timeout
+
     uint8_t msg_order = 0;
     char pre_loaded_message[NUM_MESSAGES][16];
-    strcpy(pre_loaded_message[msg_order++], "Seeing anything?");
-    strcpy(pre_loaded_message[msg_order++], "I'm surrounded");
-    strcpy(pre_loaded_message[msg_order++], "Did you shoot?");
-    strcpy(pre_loaded_message[msg_order++], "Need help, man?");
-    strcpy(pre_loaded_message[msg_order++], "Yes, need help.");
-    strcpy(pre_loaded_message[msg_order++], "Just bagged one!");
-    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");
-    strcpy(pre_loaded_message[msg_order++], "On the way down.");
-    strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");
-    strcpy(pre_loaded_message[msg_order++], "Ignore prev msg!");
-    
-    
-    // for(i = 0; i < 5; i++) {
-    //     DispRefresh();
-    //     DispWriteString(pre_loaded_message[i]);
-    //     DispLineTwo();
-    //     PrintDecimalNumber(sizeof(pre_loaded_message[i]));
-    //     tick100msDelay(20);
-    // }
-    
-    
-    // data = "Yo Yo Dog";
-    
-    // for(i=0; i < NUM_MESSAGES; i++) {
-
-    //     DispRefresh();
-    //     DispWriteString("Sending message...");
-    //     tick100msDelay(10);
-        
-    //     status = RFMsend(pre_loaded_message[i],sizeof(pre_loaded_message[i]));
-    //     DispRefresh();
-    //     DispWriteString("Done...");
-
-    //     tick100msDelay(10);
-    // } 
-
-    
-    // memcpy(rxdata,0x00,RECEIVE_BUFFER_SIZE);
-    // DispRefresh();
-    // DispWriteString("Awaiting message");
-    // tick100msDelay(5);
-
-    // for(i=0; i<50; i++){
-        
-    //     if(ReceivedPacket()){
-    //         GetRxData(rxdata);
-    //         DispRefresh();
-    //         tick100msDelay(5);
-    //         DispWriteString("Received:");
-    //         DispLineTwo();
-    //         DispWriteString(rxdata);
-    //         tick100msDelay(5);
-    //         memcpy(rxdata,0x00,RECEIVE_BUFFER_SIZE);
-    //     }
-        
-    //     tick100msDelay(10);
-    // }   
-
-    /* END OF DEBUG CODE */
+    strcpy(pre_loaded_message[msg_order++], "Seeing anything?"); 
+    strcpy(pre_loaded_message[msg_order++], "I'm surrounded");   
+    strcpy(pre_loaded_message[msg_order++], "Did you shoot?");   
+    strcpy(pre_loaded_message[msg_order++], "Need help, man?");  
+    strcpy(pre_loaded_message[msg_order++], "Yes, need help.");  
+    strcpy(pre_loaded_message[msg_order++], "Just bagged one!"); 
+    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");   
+    strcpy(pre_loaded_message[msg_order++], "On the way down."); 
+    strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");   
+    strcpy(pre_loaded_message[msg_order], "Ignore prev msg!");  
     
     while (true) {
         if(gblinfo.flag20ms) {
@@ -181,26 +137,6 @@ void main()
             health_led = ~health_led;
         }
 
-        // if(gblinfo.btn_both_pressed) {
-        //     gblinfo.btn_both_pressed = false;
-        //     DispRefresh();
-        //     DispWriteString("Both BTNs Pushed");
-        //     tick100msDelay(10);
-        // }
-        // if(gblinfo.btn_lt_pressed) {
-        //     gblinfo.btn_lt_pressed = false;
-        //     DispRefresh();
-        //     DispWriteString("BTN1 Pushed");
-        //     tick100msDelay(10);
-        // }
-        // if(gblinfo.btn_rt_pressed) {
-        //     gblinfo.btn_rt_pressed = false;
-        //     DispRefresh();
-        //     DispWriteString("BTN2 Pushed");
-        //     tick100msDelay(10);
-        // }
-
-        // disp_enable = DISPLAY_OFF;
     }
 
 }   //END Main()
@@ -262,7 +198,7 @@ void PrintSplashScreen( void ) {
 
 }
 
-void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxdata ) {
+void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata ) {
     switch(gblinfo.current_state) {
         // TODO add code that checks to see if we have a new message
         case STATE_IDLE_DISP:
@@ -300,7 +236,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxda
                 gblinfo.btn_both_pressed    = false;
             }
 
-            if(gblinfo.disp_seconds_ctr > MAX_DISP_DWELL) {
+            if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
                 disp_enable = DISPLAY_OFF;
             }
             break;
@@ -324,7 +260,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxda
                 gblinfo.msg_to_send = 0;
                 DispSetContrast(60);
                 DispRefresh();
-                DispWriteString("LAST RECEIVED");
+                DispWriteString("LAST RECEIVED:");
                 DispLineTwo();
                 DispWriteString(rxdata);
                 
@@ -337,9 +273,9 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxda
                 gblinfo.btn_both_pressed    = false;
                 DisplayDwellTmr(1);         // Send one to reset the counter
                 
-                (gblinfo.msg_to_send >= NUM_MESSAGES)?(gblinfo.msg_to_send = 0):(gblinfo.msg_to_send++);
+                (gblinfo.msg_to_send >= (NUM_MESSAGES-1))?(gblinfo.msg_to_send = 0):(gblinfo.msg_to_send++);
                 DispLineTwo();
-                DispWriteString(pre_loaded_message[gblinfo.msg_to_send]);
+                DispWtLnTwo(pre_loaded_message[gblinfo.msg_to_send]);
 
             }
             
@@ -356,9 +292,14 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxda
 
 
             }
+            
+            if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
+                disp_enable = DISPLAY_OFF;
+            }
+            
             break;
         
-        case STATE_CONFIRM_MSG:          //TODO stopped here 8/21/19
+        case STATE_CONFIRM_MSG:             // TODO stopped here 8/21/19
             if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
                 gblinfo.btn_lt_pressed       = false;
                 gblinfo.btn_rt_pressed       = false;
@@ -404,6 +345,10 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], const char * rxda
                 RFMsend(pre_loaded_message[gblinfo.msg_to_send],sizeof(pre_loaded_message[gblinfo.msg_to_send]));
             }
             
+            if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
+                disp_enable = DISPLAY_OFF;
+            }
+            
             break;
 
             case STATE_TRANSMIT_MSG:
@@ -430,7 +375,7 @@ void DisplayDwellTmr( bool reset ) {
     }
     
     else {
-        if(gblinfo.disp_tmr_active && gblinfo.disp_seconds_ctr < MAX_DISP_DWELL) 
+        if(gblinfo.disp_tmr_active && (gblinfo.disp_seconds_ctr < MAX_DISP_DWELL)) 
             gblinfo.disp_seconds_ctr++;
         else if (!gblinfo.disp_tmr_active)
             gblinfo.disp_seconds_ctr = 0;

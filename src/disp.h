@@ -44,7 +44,12 @@ void DispWriteChar (uint8_t c);
 
 void DispWriteString(const char * y);
 
+void DispWtLnTwo ( const char * y );
+
 void DispLineTwo (void );
+
+void DispLineOne (void );
+
 
 void DispSetContrast(uint8_t percentage);
 

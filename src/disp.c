@@ -103,10 +103,16 @@ void DispCursorHome( void ) {
     DispSPI1Write(0x02);
 }
 
+void DispLineOne (void ) {
+    disp_reg_sel = 0;
+    DispSPI1Write(0x80);        // Data format D[7:0] = 0b 1 A6 A5 A4 A3 A2 A1 A0.  For 0x00 = 0b 1000 0000 0x80
+}
+
 void DispLineTwo (void ) {
     disp_reg_sel = 0;
     DispSPI1Write(0xA8);        // Data format D[7:0] = 0b 1 A6 A5 A4 A3 A2 A1 A0.  For 0x40 = 0b 1010 1000 0xA8
 }
+
 
 void DispWriteChar (uint8_t c) {
     uint8_t i;
@@ -119,6 +125,23 @@ void DispWriteChar (uint8_t c) {
 
     disp_reg_sel = 0;
     
+}
+
+void DispWtLnTwo ( const char * y ) {
+    uint8_t char_ctr = 0;
+    DispLineTwo();
+
+    while(*y != '\0'){
+        DispWriteChar(*y);
+        y++;                           //Increment the pointer memory address
+        char_ctr++;
+    }
+
+    while(char_ctr < 16){
+        DispWriteChar(' ');
+        char_ctr++;
+    }
+
 }
 
 void DispWriteString(const char * y) {

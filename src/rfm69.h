@@ -62,7 +62,7 @@ uint8_t RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
 #define RFM_BROADCAST_ADDRESS   0xff
 
 // For this project, this is how large we'll allow the buffer to be
-#define RECEIVE_BUFFER_SIZE     32
+#define RECEIVE_BUFFER_SIZE     16
 
 // Max number of octets the LORA Rx/Tx FIFO can hold
 #define RFM_FIFO_SIZE           255

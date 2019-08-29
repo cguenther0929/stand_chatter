@@ -75,7 +75,7 @@ void SetUp( void );
 
 float GetBatteryVoltage ( void );   // TODO need to comment
 
-void EvaluateState(  char pre_loaded_message[NUM_MESSAGES][16], const char * rxdata );  // TODO need to comment
+void EvaluateState(  char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata );  // TODO need to comment
 
 void EvaluateButtonInputs ( void ); // TODO need to comment
 

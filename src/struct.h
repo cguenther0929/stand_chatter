@@ -45,7 +45,7 @@ extern struct GlobalInformation         //  Structure to pass information that i
     uint8_t         current_state;                  // Keep track of the radio's mode
     uint8_t         disp_seconds_ctr;               // For tracking how long the display is on
     uint8_t         msg_to_send;                    // Keep track of which message the user wishes to send
-    uint8_t         splash_screen_tmr;              // Flag that determines whether or not display timer is running
+    uint8_t        splash_screen_tmr;              // Timer 
     bool            disp_tmr_active;                // Flag that determines whether or not display timer is running
     bool            splash_screen_tmr_active;       // Flag that determines whether or not splash screen timer is running 
     
