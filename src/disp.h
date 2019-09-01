@@ -42,7 +42,7 @@ void DispInit ( void );
 
 void DispWriteChar (uint8_t c);
 
-void DispWriteString(const char * y);
+void DispWriteString(char * y);
 
 void DispWtLnTwo ( const char * y );
 

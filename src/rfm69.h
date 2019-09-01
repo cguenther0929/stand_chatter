@@ -44,7 +44,7 @@ void RFMsetMode(RadioOpMode mode);
 
 bool RFMsend(const char * data, uint8_t len);
 
-void GetRxData(uint8_t * rxdata);
+void GetRxData( void );
 
 bool RFMsetFrequency (float centre);
 

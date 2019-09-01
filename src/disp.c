@@ -144,7 +144,7 @@ void DispWtLnTwo ( const char * y ) {
 
 }
 
-void DispWriteString(const char * y) {
+void DispWriteString(char * y) {
 
     while(*y != '\0'){
         DispWriteChar(*y);

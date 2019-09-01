@@ -86,7 +86,6 @@ struct GlobalInformation gblinfo;
 void main()
 {
     uint8_t * data;
-    uint8_t rxdata[RECEIVE_BUFFER_SIZE];         // No point in making this huge as we're somewhat limited by display character size
     uint8_t temp_data;
     uint8_t rfm_temp;
     uint8_t i;
@@ -97,7 +96,7 @@ void main()
     PrintSplashScreen();
 
     //TODO the following is just for testing!
-    strcpy(rxdata[0],"Hello World");
+    strcpy(gblinfo.rxdata,"Hello World");
 
     gblinfo.disp_tmr_active = true;             // Begin the timer to kill display after timeout
 
@@ -118,12 +117,15 @@ void main()
         if(gblinfo.flag20ms) {
             gblinfo.flag20ms = false;
             EvaluateButtonInputs();
-            EvaluateState(pre_loaded_message,rxdata);
+            EvaluateState(pre_loaded_message);
         }
         
         if(gblinfo.flag100ms) {
             gblinfo.flag100ms = false;
             (gblinfo.splash_screen_tmr_active)?(gblinfo.splash_screen_tmr++):(gblinfo.splash_screen_tmr=0);
+            if(ReceivedPacket()) {
+                GetRxData();
+            }
         }
 
         if(gblinfo.flag500ms) {
@@ -198,7 +200,8 @@ void PrintSplashScreen( void ) {
 
 }
 
-void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata ) {
+void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
+    
     switch(gblinfo.current_state) {
         // TODO add code that checks to see if we have a new message
         case STATE_IDLE_DISP:
@@ -262,7 +265,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata 
                 DispRefresh();
                 DispWriteString("LAST RECEIVED:");
                 DispLineTwo();
-                DispWriteString(rxdata);
+                DispWriteString(gblinfo.rxdata);
                 
                 gblinfo.current_state = STATE_IDLE_DISP;
             }
@@ -299,7 +302,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata 
             
             break;
         
-        case STATE_CONFIRM_MSG:             // TODO stopped here 8/21/19
+        case STATE_CONFIRM_MSG:        
             if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
                 gblinfo.btn_lt_pressed       = false;
                 gblinfo.btn_rt_pressed       = false;
@@ -317,9 +320,9 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata 
                 gblinfo.msg_to_send = 0;
                 DispSetContrast(60);
                 DispRefresh();
-                DispWriteString("LAST RECEIVED");
+                DispWriteString("LAST RECEIVED:");
                 DispLineTwo();
-                DispWriteString(rxdata);
+                DispWriteString(gblinfo.rxdata);
                 
                 gblinfo.current_state = STATE_IDLE_DISP;
             }
@@ -351,18 +354,18 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16], uint8_t * rxdata 
             
             break;
 
-            case STATE_TRANSMIT_MSG:
-                if(gblinfo.splash_screen_tmr >= SPLASH_SCREEN_DWELL) {
-                    gblinfo.current_state = STATE_IDLE_DISP;
-                    gblinfo.splash_screen_tmr_active = false;
-                    gblinfo.msg_to_send = 0;
-                    DispRefresh();
-                    DispWriteString("LAST RECEIVED:");
-                    DispLineTwo();
-                    DispWriteString(rxdata);
-                }
-                
-                break;
+        case STATE_TRANSMIT_MSG:
+            if(gblinfo.splash_screen_tmr >= SPLASH_SCREEN_DWELL) {
+                gblinfo.current_state = STATE_IDLE_DISP;
+                gblinfo.splash_screen_tmr_active = false;
+                gblinfo.msg_to_send = 0;
+                DispRefresh();
+                DispWriteString("LAST RECEIVED:");
+                DispLineTwo();
+                DispWriteString(gblinfo.rxdata);
+            }
+            
+            break;
     }
 
 }

@@ -141,12 +141,12 @@ bool RFMsend(const char * data, uint8_t len)
     return true;
 }
 
-void GetRxData(uint8_t * rxdata) {
+void GetRxData( void ) {
     
     uint8_t len = RFMSPI2Read(RH_RF95_REG_13_RX_NB_BYTES);
 
     RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, RFMSPI2Read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR));
-    RFMSPI2ReadBurst(RFM_REG_00_FIFO, rxdata, len);
+    RFMSPI2ReadBurst(RFM_REG_00_FIFO, gblinfo.rxdata, len);
 	RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
 
     RFMsetMode(RFM_MODE_STANDBY);

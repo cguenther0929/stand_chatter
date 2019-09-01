@@ -28,24 +28,25 @@
 
 extern struct GlobalInformation         //  Structure to pass information that is shared among modules
 {
-    uint16_t        tick20ms;               // Increases every 20 mili-seconds
-    uint16_t        tick100ms;              // Used to keep track of passing deci-tick1000monds
-    uint16_t        tick500ms;              // Used to keep track of passing deci-tick1000monds
-    uint16_t        tick1000ms;             // Use this to tick tick1000monds -- might not be used for audio interface board
+    uint16_t        tick20ms;                       // Increases every 20 mili-seconds
+    uint16_t        tick100ms;                      // Used to keep track of passing deci-tick1000monds
+    uint16_t        tick500ms;                      // Used to keep track of passing deci-tick1000monds
+    uint16_t        tick1000ms;                     // Use this to tick tick1000monds -- might not be used for audio interface board
     
-    bool            flag20ms;               // Set every 10ms -- not supported in this application
-    bool            flag100ms;              // Set every 100ms
-    bool            flag500ms;              // Set every 500ms
-    bool            flag1000ms;             // Set every 1000ms
+    bool            flag20ms;                       // Set every 10ms -- not supported in this application
+    bool            flag100ms;                      // Set every 100ms
+    bool            flag500ms;                      // Set every 500ms
+    bool            flag1000ms;                     // Set every 1000ms
 
     /* RADIO TRANSCEIVER RELATED */
-    uint8_t         rfmmode;                // Keep track of the radio's mode
+    uint8_t         rfmmode;                        // Keep track of the radio's mode
+    char            rxdata[16];                     // Receive buffer
 
     /* STATE MACHINE RELATED */
     uint8_t         current_state;                  // Keep track of the radio's mode
     uint8_t         disp_seconds_ctr;               // For tracking how long the display is on
     uint8_t         msg_to_send;                    // Keep track of which message the user wishes to send
-    uint8_t        splash_screen_tmr;              // Timer 
+    uint8_t         splash_screen_tmr;              // Timer 
     bool            disp_tmr_active;                // Flag that determines whether or not display timer is running
     bool            splash_screen_tmr_active;       // Flag that determines whether or not splash screen timer is running 
     
