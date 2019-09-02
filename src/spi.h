@@ -13,8 +13,8 @@
 *
 ******************************************************************************/
 
-#ifndef _H_SPI_H
-#define _H_SPI_H
+#ifndef __SPI_H_
+#define __SPI_H_
 
 // #include "htc.h"
 #include <xc.h>         //Part specific header file
@@ -25,16 +25,8 @@
 #include "isr.h"
 #include "config.h"     //Project specific header file
 #include "timer.h"
-#include "config.h"
 #include "rfm69.h"
-
-/* DEFINE THE EEPROM INSTRUCTIONS */
-// #define promread        0x03            //Clock this in to read the chip
-// #define promwrite       0x02            //Clock this in to write
-// #define disablewrite    0x04            //Disable write operations
-// #define enablewrite     0x06            //Enable write operations
-// #define statusreg       0x05            //Instruction to read status reg
-// #define statuswrite     0x01            //Instruction to write status reg
+#include "main.h"
 
 #define spidelay        50             //Define a small delay
 
@@ -53,6 +45,8 @@ void SPI2Init( void );  //TODO need to comment
 void RFMSPI2Write(uint8_t addr, uint8_t data);
 
 void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len);
+
+void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
 
 uint8_t RFMSPI2Read(uint8_t addr);      // TODO need to comment
 

@@ -18,6 +18,7 @@
 #include "rfm69.h"		    // Include the header file for this module
 
 struct GlobalInformation gblinfo;
+struct RFM rfm;
 
 void RFMInitialize( void ) {
 
@@ -146,7 +147,7 @@ void GetRxData( void ) {
     uint8_t len = RFMSPI2Read(RH_RF95_REG_13_RX_NB_BYTES);
 
     RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, RFMSPI2Read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR));
-    RFMSPI2ReadBurst(RFM_REG_00_FIFO, gblinfo.rxdata, len);
+    RFMSPI2ReadBurst(RFM_REG_00_FIFO, rfm.rxdata, len);
 	RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
 
     RFMsetMode(RFM_MODE_STANDBY);
@@ -155,9 +156,9 @@ void GetRxData( void ) {
 bool ReceivedPacket( void ) {
     uint8_t temp_data;
     
-    if (gblinfo.rfmmode == RFM_MODE_TX) return false;
+    if (rfm.rfmmode == RFM_MODE_TX) return false;
     
-    if (!(gblinfo.rfmmode == RFM_MODE_RX)) {
+    if (!(rfm.rfmmode == RFM_MODE_RX)) {
         RFMsetMode(RFM_MODE_RX);                            // If not already in RX mode, put in this mode
         return false;
     }
@@ -169,12 +170,12 @@ bool ReceivedPacket( void ) {
     return false; 
 }
 
-void RFMsetMode(RadioOpMode mode) {
+void RFMsetMode(uint8_t mode) {
   
-    if (mode == gblinfo.rfmmode)
+    if (mode == rfm.rfmmode)
         return;
 
-    gblinfo.rfmmode = mode;
+    rfm.rfmmode = mode;
     
     switch (mode) {
         case RFM_MODE_TX:           // Mode mask register: 1111 1MMM
@@ -214,7 +215,7 @@ void RFMsetPreambleLength(uint16_t bytes) {
 }
 
 bool RFMtxInProgress( void ) { 
-    if (gblinfo.rfmmode == RFM_MODE_TX) return true;
+    if (rfm.rfmmode == RFM_MODE_TX) return true;
     return false;
 }
 

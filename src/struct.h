@@ -24,7 +24,11 @@
 #include "main.h"             //Project specific header file
 #include "rfm69.h"
 
-
+extern struct RFM {
+    /* RADIO TRANSCEIVER RELATED */
+    uint8_t         rfmmode;                        // Keep track of the radio's mode
+    char            rxdata[16];                     // Receive buffer
+} RFM;
 
 extern struct GlobalInformation         //  Structure to pass information that is shared among modules
 {
@@ -38,9 +42,6 @@ extern struct GlobalInformation         //  Structure to pass information that i
     bool            flag500ms;                      // Set every 500ms
     bool            flag1000ms;                     // Set every 1000ms
 
-    /* RADIO TRANSCEIVER RELATED */
-    uint8_t         rfmmode;                        // Keep track of the radio's mode
-    char            rxdata[16];                     // Receive buffer
 
     /* STATE MACHINE RELATED */
     uint8_t         current_state;                  // Keep track of the radio's mode

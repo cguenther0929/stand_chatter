@@ -25,22 +25,27 @@
 #include <string.h>
 #include "struct.h"
 #include "config.h"     //Project specific header file
+#include "main.h"
 #include "spi.h"
 #include "disp.h"
-#include "main.h"
 
-typedef enum {
-    RFM_MODE_SLEEP,   
-    RFM_MODE_STANDBY,
-    RFM_MODE_RX,     
-    RFM_MODE_TX     
-} RadioOpMode;
+#define RFM_MODE_SLEEP      0   
+#define RFM_MODE_STANDBY    1
+#define RFM_MODE_RX         2
+#define RFM_MODE_TX         3
+
+// typedef enum {
+//     RFM_MODE_SLEEP,   
+//     RFM_MODE_STANDBY,
+//     RFM_MODE_RX,     
+//     RFM_MODE_TX     
+// } RadioOpMode;
 
 //extern RadioOpMode;
 
 void RFMInitialize( void );
 
-void RFMsetMode(RadioOpMode mode);
+void RFMsetMode(uint8_t mode);
 
 bool RFMsend(const char * data, uint8_t len);
 
@@ -55,8 +60,6 @@ void RFMsetPreambleLength(uint16_t bytes);
 bool RFMtxInProgress( void );
 
 bool ReceivedPacket( void );  //TODO comment: Checks to see that we're not in transmit mode, and if the RXDone Pin Is set.
-
-uint8_t RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
 
 // This is the address that indicates a broadcast
 #define RFM_BROADCAST_ADDRESS   0xff

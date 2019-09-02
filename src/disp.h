@@ -10,8 +10,8 @@
 *
 ******************************************************************************/
 
-#ifndef _H_DISP_H
-#define _H_DISP_H
+#ifndef __DISP_H_
+#define __DISP_H_
 
 #include <xc.h>         //Part specific header file
 #include <stdint.h>
@@ -20,9 +20,8 @@
 #include <stdio.h>
 #include "struct.h"
 #include "config.h"     //Project specific header file
-#include "config.h"
-#include "spi.h"
 #include "main.h"
+#include "spi.h"
 
 #define LF			1
 #define CR			2
@@ -43,6 +42,8 @@ void DispInit ( void );
 void DispWriteChar (uint8_t c);
 
 void DispWriteString(char * y);
+
+void DispWtLnOne ( const char * y );
 
 void DispWtLnTwo ( const char * y );
 

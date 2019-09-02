@@ -15,6 +15,7 @@
 
 /*  DEFINE THE STRUCTURE USED IN THIS FILE */
 struct GlobalInformation sysinfo;
+struct RFM rfm;
 
 void SPI1Init( void ){  
     
@@ -140,7 +141,7 @@ uint8_t RFMSPI2Read(uint8_t addr) {
     return (rcvd_data);
 }
 
-uint8_t RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len) {  
+void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len) {  
     
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;                  // Use this to read the received data (should be done)

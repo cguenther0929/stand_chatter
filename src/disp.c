@@ -127,6 +127,23 @@ void DispWriteChar (uint8_t c) {
     
 }
 
+void DispWtLnOne ( const char * y ) {
+    uint8_t char_ctr = 0;
+    DispLineOne();
+
+    while(*y != '\0'){
+        DispWriteChar(*y);
+        y++;                           //Increment the pointer memory address
+        char_ctr++;
+    }
+
+    while(char_ctr < 16){
+        DispWriteChar(' ');
+        char_ctr++;
+    }
+
+}
+
 void DispWtLnTwo ( const char * y ) {
     uint8_t char_ctr = 0;
     DispLineTwo();
@@ -188,7 +205,6 @@ void DispWrite8b (uint8_t number) {
         temp = number >> (i - 1);
         temp = temp & 0x01;
         temp = temp + 0x30;         //Turn this into an ASCII value
-        // TXREG1 = temp;
         DispWriteChar(temp);
     }
 }
