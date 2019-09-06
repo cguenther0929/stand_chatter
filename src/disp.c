@@ -117,8 +117,6 @@ void DispLineTwo (void ) {
 void DispWriteChar (uint8_t c) {
     uint8_t i;
     
-    disp_enable = DISPLAY_ON;
-    
     disp_reg_sel = 1;
     for (i=0;i<50;i++);
     DispSPI1Write(c);

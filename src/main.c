@@ -96,9 +96,6 @@ void main()
     
     PrintSplashScreen();
 
-    //TODO the following is just for testing!
-    strcpy(rfm.rxdata,"Hello World");
-
     gblinfo.disp_tmr_active = true;             // Begin the timer to kill display after timeout
 
     uint8_t msg_order = 0;
@@ -106,8 +103,10 @@ void main()
     strcpy(pre_loaded_message[msg_order++], "Seeing anything?"); 
     strcpy(pre_loaded_message[msg_order++], "I'm surrounded");   
     strcpy(pre_loaded_message[msg_order++], "Did you shoot?");   
+    strcpy(pre_loaded_message[msg_order++], "Yes, I shot!");   
     strcpy(pre_loaded_message[msg_order++], "Need help, man?");  
-    strcpy(pre_loaded_message[msg_order++], "Yes, need help.");  
+    strcpy(pre_loaded_message[msg_order++], "Yes, please.");  
+    strcpy(pre_loaded_message[msg_order++], "No, thank you.");  
     strcpy(pre_loaded_message[msg_order++], "Just bagged one!"); 
     strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");   
     strcpy(pre_loaded_message[msg_order++], "On the way down."); 
@@ -177,11 +176,13 @@ void PrintSplashScreen( void ) {
     float battery_voltage = 0.0;
     
     DispSetContrast(60);
-    DispRefresh();
-    DispWriteString("Stand Chatter");
-    DispLineTwo();
-    DispWriteString("FW v"); DispWriteChar(MAJVER + 0x30); DispWriteChar(MINVER + 0x30); DispWriteChar(BUGVER + 0x30);
-    tick100msDelay(10);
+    DispWtLnOne("~~STAND~~");
+    DispWtLnTwo("~~CHATTER~~");
+    DispWriteString("FW v"); 
+    DispWriteChar(MAJVER + 0x30); DispWriteChar('.');
+    DispWriteChar(MINVER + 0x30); DispWriteChar('.');
+    DispWriteChar(BUGVER + 0x30);
+    tick100msDelay(7);
     
     battery_voltage = GetBatteryVoltage();
 
@@ -189,27 +190,25 @@ void PrintSplashScreen( void ) {
     DispWriteString("Battery Voltage");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
-    tick100msDelay(10);
+    tick100msDelay(7);
 
-    DispRefresh();
-    DispWriteString("Waiting for");
-    DispLineTwo();
-    DispWriteString("message");
+    DispWtLnOne("Waiting for");
+    DispWtLnTwo("message");
 
 }
 
 void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
     uint8_t temp_data;
+    //extern CURRENTSTATE state;
 
     if(ReceivedPacket()) {
-        temp_data = gblinfo.current_state;
+        temp_data = gblinfo.current_state;          // Can we maybe remove this one and the one further down and this still work?
         GetRxData();
         gblinfo.current_state = temp_data;  
         if (gblinfo.current_state == STATE_IDLE_DISP) {
-            DispRefresh();
-            DispWriteString("NEW MSG:");
-            DispLineTwo();
-            DispWriteString(rfm.rxdata);
+            DisplayDwellTmr(DISP_TMR_RST);         // Send one to reset the counter
+            DispWtLnOne("NEW MSG:");
+            DispWtLnTwo(rfm.rxdata);
         }
     }
     
@@ -234,10 +233,8 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
                 // Transition into display send-able messages 
                 gblinfo.msg_to_send = 0;
                 DispSetContrast(60);
-                DispRefresh();
-                DispWriteString("SEND");
-                DispLineTwo();
-                DispWriteString(pre_loaded_message[gblinfo.msg_to_send]);
+                DispWtLnOne("SEND:");
+                DispWtLnTwo(pre_loaded_message[gblinfo.msg_to_send]);
 
                 gblinfo.current_state = STATE_SELECT_MSG;
             }
@@ -487,7 +484,9 @@ void EvaluateButtonInputs ( void ) {
 }
 
 void SetUp(void)
-{
+{   
+    //extern CURRENTSTATE state;
+
     /* PIN DIRECTIONS FOR ANALOG SELECT */
     TRISA5 = input;
     

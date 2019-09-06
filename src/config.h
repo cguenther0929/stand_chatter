@@ -38,11 +38,11 @@
 
 /* DEFINE CODE VERSION NUMBER */
 #define MAJVER                  0x00
-#define MINVER                  0x00
-#define BUGVER                  0x01
+#define MINVER                  0x01
+#define BUGVER                  0x00
 
 /* DEFINITIONS FOR MESSAGES */
-#define NUM_MESSAGES            10
+#define NUM_MESSAGES            12
 
 /* DEFINITIONS RELATED TO DISPLAY */
 #define MAX_DISP_DWELL          5                           // Max amount of time (in seconds) display is allowed to be ON
@@ -76,14 +76,6 @@
 /* DEFINE VARIOUS PIN FUNCITONS */
 #define output              0           //Define the output pin direction setting
 #define input               1
-
-/* STATE FOR FSM */
-#define STATE_IDLE_DISP         0           // Idle state with dispaly on -- RX Continuous
-#define STATE_IDLE_NO_DISP      1           // Idle state with display off -- RX Continuous
-#define STATE_SELECT_RECIPENTS  2           // Scrolling through a list of possible recipents 
-#define STATE_SELECT_MSG        3           // Scrolling through list of possible messages
-#define STATE_CONFIRM_MSG       4           // Confirm message to send
-#define STATE_TRANSMIT_MSG      5           // Transmitting message  
 
 /* INTUTIVE TIMER NAMES */
 #define TIMER1              1

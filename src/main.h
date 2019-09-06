@@ -23,22 +23,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "config.h"     //Project specific header file
 #include "struct.h"
 #include "isr.h"
-#include "config.h"     //Project specific header file
 #include "timer.h"
 #include "spi.h"
 #include "disp.h"
 #include "adc.h"
 
-// typedef enum {
+
+/* STATE FOR FSM */
+#define STATE_IDLE_DISP         0           // Idle state with dispaly on -- RX Continuous
+#define STATE_IDLE_NO_DISP      1           // Idle state with display off -- RX Continuous
+#define STATE_SELECT_RECIPENTS  2           // Scrolling through a list of possible recipents 
+#define STATE_SELECT_MSG        3           // Scrolling through list of possible messages
+#define STATE_CONFIRM_MSG       4           // Confirm message to send
+#define STATE_TRANSMIT_MSG      5           // Transmitting message  
+
+// enum STATE {
 //     STATE_IDLE_DISP,                    // Idle state with dispaly on -- RX Continuous
 //     STATE_IDLE_NO_DISP,                 // Idle state with display off -- RX Continuous
 //     STATE_SELECT_RECIPENTS,             // Scrolling through a list of possible recipents 
 //     STATE_SELECT_MSG,                   // Scrolling through list of possible messages
 //     STATE_CONFIRM_MSG,                   // Confirm message to send
 //     STATE_TRANSMIT_MSG                  // Transmitting message  
-// } CurrentState;
+// };
+
+extern enum STATE state;
 
 /* DEFINES FOR TIMER ACTION*/
 #define DISP_TMR_RST        0
@@ -79,8 +90,7 @@ void SetUp( void );
 
 float GetBatteryVoltage ( void );   // TODO need to comment
 
-// void EvaluateState(  char pre_loaded_message[NUM_MESSAGES][16]);  // TODO need to comment
-void EvaluateState(  char pre_loaded_message[10][16]);  // TODO need to comment
+void EvaluateState(  char pre_loaded_message[][16]);  // TODO need to comment
 
 void EvaluateButtonInputs ( void ); // TODO need to comment
 
