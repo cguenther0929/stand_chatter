@@ -40,17 +40,6 @@
 #define STATE_CONFIRM_MSG       4           // Confirm message to send
 #define STATE_TRANSMIT_MSG      5           // Transmitting message  
 
-// enum STATE {
-//     STATE_IDLE_DISP,                    // Idle state with dispaly on -- RX Continuous
-//     STATE_IDLE_NO_DISP,                 // Idle state with display off -- RX Continuous
-//     STATE_SELECT_RECIPENTS,             // Scrolling through a list of possible recipents 
-//     STATE_SELECT_MSG,                   // Scrolling through list of possible messages
-//     STATE_CONFIRM_MSG,                   // Confirm message to send
-//     STATE_TRANSMIT_MSG                  // Transmitting message  
-// };
-
-extern enum STATE state;
-
 /* DEFINES FOR TIMER ACTION*/
 #define DISP_TMR_RST        0
 #define DISP_TMR_CNT        1
@@ -88,14 +77,55 @@ void tick20msDelay( uint16_t ticks );
 ********************************************************/
 void SetUp( void );
 
-float GetBatteryVoltage ( void );   // TODO need to comment
+/********************************************************
+*FUNCTION: float GetBatteryVoltage ( void )
+*PURPOSE: Retreive batter voltage
+*PRECONDITION: ADC must be configured.  
+*POSTCONDITION: Battery voltage measured
+*RETURN: Float value of battery voltage
+********************************************************/
+float GetBatteryVoltage ( void );   
 
-void EvaluateState(  char pre_loaded_message[][16]);  // TODO need to comment
+/********************************************************
+*FUNCTION: void EvaluateState(  char pre_loaded_message[][16])
+*PURPOSE: Evaluate FSM
+*PRECONDITION: pre loaded messages array must be configured.  
+            struct containing receiver buffer shall be configured.
+*POSTCONDITION: FSM analyzed
+*RETURN: Nothing
+********************************************************/
+void EvaluateState(  char pre_loaded_message[][16]);
 
-void EvaluateButtonInputs ( void ); // TODO need to comment
+/********************************************************
+*FUNCTION: void EvaluateButtonInputs ( void )
+*PURPOSE: Evaluate whethere or not a button has been pushed
+*PRECONDITION: GPIO for buttons must me configured.  Timebase
+            shall be configured and running.  
+*POSTCONDITION: Button pushes analyzed
+*RETURN: Nothing
+********************************************************/
+void EvaluateButtonInputs ( void ); 
 
+/*
+ * Function:  void DisplayDwellTmr( uint8_t action)
+ * --------------------
+ * Handle display dwell timer.  This timer is responsible
+ * for powering off the display backlight after a period of 
+ * no activity (no buttons or received messages)
+ *
+ * returns: Nothing
+ */
 void DisplayDwellTmr( uint8_t action);  // TODO need to comment
 
+/*
+ * Function:  void PrintSplashScreen( void )
+ * --------------------
+ * Print information like model name/FW version/
+ * battery voltage before the device enters into 
+ * the FSM. computes an approximation of pi using:
+ *
+ * returns: Nothing
+ */
 void PrintSplashScreen( void );     // TODO need to comment
 
 #endif

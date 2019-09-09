@@ -176,18 +176,17 @@ void PrintSplashScreen( void ) {
     float battery_voltage = 0.0;
     
     DispSetContrast(60);
-    DispWtLnOne("~~STAND~~");
-    DispWtLnTwo("~~CHATTER~~");
+    DispWtLnOne("-----STAND------");
+    DispWtLnTwo("-----CHATTER----");
+    tick100msDelay(2);
     DispWriteString("FW v"); 
     DispWriteChar(MAJVER + 0x30); DispWriteChar('.');
     DispWriteChar(MINVER + 0x30); DispWriteChar('.');
     DispWriteChar(BUGVER + 0x30);
-    tick100msDelay(7);
     
     battery_voltage = GetBatteryVoltage();
 
-    DispRefresh();
-    DispWriteString("Battery Voltage");
+    DispWtLnOne("BATTERY VOLTAGE: ");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
     tick100msDelay(7);

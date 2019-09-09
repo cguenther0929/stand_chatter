@@ -34,32 +34,94 @@
 #define RFM_MODE_RX         2
 #define RFM_MODE_TX         3
 
-// typedef enum {
-//     RFM_MODE_SLEEP,   
-//     RFM_MODE_STANDBY,
-//     RFM_MODE_RX,     
-//     RFM_MODE_TX     
-// } RadioOpMode;
-
-//extern RadioOpMode;
-
+/*
+ * Function: void RFMInitialize( void )
+ * --------------------
+ * Initialize the radio module.  This entails making
+ * multiple writes to various configuration registers
+ *
+ * returns: Nothing
+ */
 void RFMInitialize( void );
 
+/*
+ * Function: void RFMsetMode (uint8_t mode)
+ * --------------------
+ * Set the mode of the radio by passing in the desired
+ * mode.  
+ *
+ * returns: Nothing
+ */
 void RFMsetMode(uint8_t mode);
 
+/*
+ * Function: bool RFMsend(const char * data, uint8_t len)
+ * --------------------
+ * Send a packet.  The packet (array) and the length of the 
+ * packet shall be passed to the function.  If successful, 
+ * the function will return true.  .  
+ *
+ * returns: True if successful, False if not
+ */
 bool RFMsend(const char * data, uint8_t len);
 
+/*
+ * Function: void GetRxData( void )
+ * --------------------
+ * It is known that a packet has arrived prior to calling.
+ * The rxbuffer (in the structure) will be updated with data
+ * from the new packet.
+ *
+ * returns: Nothing
+ */
 void GetRxData( void );
 
+/*
+ * Function: bool RFMsetFrequency (float centre)
+ * --------------------
+ * Set IF frequency of  the radio module
+ *
+ * returns: Nothing
+ */
 bool RFMsetFrequency (float centre);
 
+/*
+ * Function: void RFMsetTxPower(int8_t power, bool useRFO)
+ * --------------------
+ * Set transmit power of the radio
+ *
+ * returns: Nothing
+ */
 void RFMsetTxPower(int8_t power, bool useRFO);
 
+/*
+ * Function: void RFMsetPreambleLength(uint16_t bytes)
+ * --------------------
+ * Set preamble length for packets sent and received
+ *
+ * returns: Nothing
+ */
 void RFMsetPreambleLength(uint16_t bytes);
 
+/*
+ * Function: bool RFMtxInProgress( void )
+ * --------------------
+ * This function will be called to see if a transmission 
+ * is in progress.  
+ *
+ * returns: True if a packet is being transmitted
+ */
 bool RFMtxInProgress( void );
 
-bool ReceivedPacket( void );  //TODO comment: Checks to see that we're not in transmit mode, and if the RXDone Pin Is set.
+/*
+ * Function: bool ReceivedPacket( void )
+ * --------------------
+ * Checks to see if a packet has been received.  
+ * if received, call function GetRxData.  
+ *
+ * returns: True if a packet is being transmitted
+ */
+bool ReceivedPacket( void );  
 
 // This is the address that indicates a broadcast
 #define RFM_BROADCAST_ADDRESS   0xff
@@ -92,7 +154,6 @@ bool ReceivedPacket( void );  //TODO comment: Checks to see that we're not in tr
 #define RH_RF95_FSTEP  (RH_RF95_FXOSC / 524288)
 
 /* RFM69 PARAMETERS */
-//TODO do we need all of these?  Should we clean up?  Taken from github
 #define RF69_MAX_DATA_LEN       61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead - 2 bytes crc)
 #define CSMA_LIMIT              -90 // upper RX signal sensitivity threshold in dBm for carrier sense access
 
