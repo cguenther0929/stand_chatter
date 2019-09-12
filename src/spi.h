@@ -4,19 +4,15 @@
 *	PURPOSE: Header file for SPI communication
 *			Target device: PIC16F15xx 8 bit MCU.   
 *
-*	AUTHOR: Clinton Guenther
-*
-*	:TODO:	
-*
-*	REVISION HISTORY:
-*	2/3/13 REV 0.01 - Original file created by C. Guenther
+*	TODO:
+*	
+*   NOTE:
 *
 ******************************************************************************/
 
 #ifndef __SPI_H_
 #define __SPI_H_
 
-// #include "htc.h"
 #include <xc.h>         //Part specific header file
 #include <stdint.h>
 #include <stdbool.h>
@@ -31,45 +27,74 @@
 #define spidelay        50             //Define a small delay
 
 
-/********************************************************
-*FUNCTION: void SPI1Init( void )
-*PURPOSE: Initialize the SPI module
-*PRECONDITION: SPI module not initialized
-*POSTCONDITION: SPI module is now initialized
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void SPI1Init( void )
+ * --------------------
+ * Initialize the SPI1 module.  
+ * 
+ * returns: Nothing
+ */
 void SPI1Init( void );
 
-void SPI2Init( void );  //TODO need to comment
+/*
+ * Function:  void SPI2Init( void )
+ * --------------------
+ * Initialize the SPI2 module.  
+ * 
+ * returns: Nothing
+ */
+void SPI2Init( void );  
 
+/*
+ * Function: void RFMSPI2Write(uint8_t addr, uint8_t data)
+ * --------------------
+ * Write the byte of data at the address defined.  
+ * SPI2 module shall first be configured.    
+ * 
+ * returns: Nothing
+ */
 void RFMSPI2Write(uint8_t addr, uint8_t data);
 
+/*
+ * Function: void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len)
+ * --------------------
+ * Write multiple bytes of data starting at the deinfed address.  
+ * The number of byes to be written is defined by the len parameter.  
+ * 
+ * returns: Nothing
+ */
 void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len);
 
+/*
+ * Function: void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len)
+ * --------------------
+ * Read multiple bytes of data starting at the deinfed address.  
+ * The number of byes to be read is defined by the len parameter.  
+ * 
+ * returns: Nothing
+ */
 void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
 
-uint8_t RFMSPI2Read(uint8_t addr);      // TODO need to comment
+/*
+ * Function: uint8_t RFMSPI2Read(uint8_t addr)
+ * --------------------
+ * Read a byte of data at the address defined.  
+ * SPI2 module shall first be configured.    
+ * 
+ * returns: Byte of data extracted from SPI
+ * transaction
+ */
+uint8_t RFMSPI2Read(uint8_t addr);     
 
-void DispSPI1Write(uint8_t data);        //TODO need to comment
-
-/********************************************************
-*FUNCTION: uint8_t SPI1Read(uint8_t addr)
-*PURPOSE: Read a byte of data
-*PRECONDITION: None
-*POSTCONDITION: One byte of data read over SPI interface
-*RETURN: Nothing
-********************************************************/
-uint8_t SPI1Read(uint8_t addr);
-
-/********************************************************
-*FUNCTION: void SPIBurnDelay(void)
-*PURPOSE: Give chip time to burn data to memory
-*PRECONDITION: None
-*POSTCONDITION: Time alloted so the EEPROM can burn information 
-            to memory
-*RETURN: Nothing
-********************************************************/
-void SPIBurnDelay(void);
+/*
+ * Function: void DispSPI1Write(uint8_t data)
+ * --------------------
+ * Write the byte of data to the display module
+ * SPI1 module shall first be configured.  
+ * 
+ * returns: Nothing 
+ */
+void DispSPI1Write(uint8_t data);
 
 #endif
 /* END OF FILE */

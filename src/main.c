@@ -3,15 +3,10 @@
 *
 *   PURPOSE: Main source
 *
-*   DEVICE: PIC18F66K22
+*   TODO:  
 *
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
-*   TODO:  When reading from timer one in 16bit mode, we must read from the LOW byte first!
-*
-*   NOTE:
+*   NOTE: When reading from timer one in 16bit mode, 
+*           we must read from the LOW byte first!
 *
 ******************************************************************************/
 
@@ -212,7 +207,6 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
     }
     
     switch(gblinfo.current_state) {
-        // TODO add code that checks to see if we have a new message
         case STATE_IDLE_DISP:
             
             if ((gblinfo.btn_lt_pressed || gblinfo.btn_rt_pressed || gblinfo.btn_both_pressed) && (disp_enable == DISPLAY_OFF)) {    // Simply turn display back on
@@ -294,10 +288,6 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
                 gblinfo.btn_rt_pressed       = false;
                 gblinfo.btn_both_pressed    = false;
                 DisplayDwellTmr(DISP_TMR_RST);         // Send one to reset the counter
-                
-                // DispRefresh();          //TODO remove these three lines
-                // DispWriteString("DBG MOVING STATE");
-                // tick100msDelay(10);
                 
                 // Transition to confirming sending message
                 DispCursorHome();
@@ -612,7 +602,7 @@ void SetUp(void)
     RFM_RST = 1;                    //Active low reset, so bring high
     tick100msDelay(5);
 
-    RFMInitialize( );        // Takes parameters netwrokID and node ID  //TODO I'm not sure if these values are okay?
+    RFMInitialize( );        // Takes parameters netwrokID and node ID  
     if(!RFMsetFrequency(915.0)) {
         DispSetContrast(60);
         DispRefresh();

@@ -3,12 +3,6 @@
 *
 *   PURPOSE: Source file containing all timer-related routines.  
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:
@@ -103,7 +97,6 @@ void Timer0Init(uint8_t interrupts, uint16_t prescaler, uint8_t clksource ) {
     }
 }
 
-//TODO  Remove this note -- this will be the timer to count ticks between commutate and crossover
 void Timer1Init( uint8_t interrupts, uint8_t prescaler, uint8_t clksource ) {
     
     T1CONbits.RD16 = 1;               //Allow 16 bits to be written to the timer register at at once.  

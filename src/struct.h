@@ -3,17 +3,12 @@
 *
 *   PURPOSE: Structures used throughout the code base are defined here.  
 *
-*   DEVICE: PPIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:
 *
 ******************************************************************************/
+
 #ifndef __STRUCT_H_
 #define __STRUCT_H_
 
@@ -25,12 +20,11 @@
 #include "rfm69.h"
 
 extern struct RFM {
-    /* RADIO TRANSCEIVER RELATED */
     uint8_t         rfmmode;                        // Keep track of the radio's mode
     char            rxdata[16];                     // Receive buffer
 } RFM;
 
-extern struct GlobalInformation         //  Structure to pass information that is shared among modules
+extern struct GlobalInformation         
 {
     uint16_t        tick20ms;                       // Increases every 20 mili-seconds
     uint16_t        tick100ms;                      // Used to keep track of passing deci-tick1000monds
@@ -42,7 +36,6 @@ extern struct GlobalInformation         //  Structure to pass information that i
     bool            flag500ms;                      // Set every 500ms
     bool            flag1000ms;                     // Set every 1000ms
 
-
     /* STATE MACHINE RELATED */
     uint8_t         current_state;                  // Keep track of the radio's mode
     uint8_t         disp_seconds_ctr;               // For tracking how long the display is on
@@ -50,7 +43,6 @@ extern struct GlobalInformation         //  Structure to pass information that i
     uint8_t         splash_screen_tmr;              // Timer 
     bool            disp_tmr_active;                // Flag that determines whether or not display timer is running
     bool            splash_screen_tmr_active;       // Flag that determines whether or not splash screen timer is running 
-    
 
     /* BUTTON RELATED */
     uint8_t         btn_lt_press_ctr;
@@ -59,8 +51,6 @@ extern struct GlobalInformation         //  Structure to pass information that i
     bool            btn_lt_pressed;
     bool            btn_rt_pressed;
     bool            btn_both_pressed;
-
-
 } GlobalInformation;
 
 

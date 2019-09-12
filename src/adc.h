@@ -4,12 +4,6 @@
 *   PURPOSE:  ADC header file.  This file will define all routines and
 *           values that will be used by the ADC module.
 *
-*   DEVICE: PIC18LF6620
-*
-*   COMPILER: Microchip XC8 v1.10
-*
-*   IDE: MPLAB X v1.60
-*
 *   TODO:
 *
 *   NOTE:
@@ -36,34 +30,33 @@
 #define RIGHT_JUSTIFIED         2
 
 
-/********************************************************
-*FUNCTION: void EnableA2D( void )
-*PURPOSE: Turn on the A2D module
-*PRECONDITION: A2D may be off
-*POSTCONDITION: A2D module now on
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void EnableA2D( void );
+ * --------------------
+ * Turn on and configure the A2D peripheral  
+ *
+ * returns: Nothing 
+ */
 void EnableA2D( void );
 
-/********************************************************
-*FUNCTION: uint8_t ReadA2D( uint8_t8_t CHAN, bool FILTER)
-*PURPOSE: Read that ADC at the desired channel.
-*   Take 16 samples and average
-*   Function allows user to take a snapshot or 16 reading
-*   average.
-*PRECONDITION: Associated IO pins must be set properly
-*POSTCONDITION: Value is read from the desired channel
-*RETURN: 10 bit ADC reading from channel (little endin)
-********************************************************/
+/*
+ * Function:  uint16_t ReadA2D( uint8_t CHAN, bool FILTER );
+ * --------------------
+ * Read from ADC at the desired channel.
+ * Take 16 samples and average if FILTER bool is set.
+ * ADC module shall first be configured via InitA2D.  
+ * 
+ * returns: 10 bit ADC reading from channel (little endin)
+ */
 uint16_t ReadA2D( uint8_t CHAN, bool FILTER );
 
-/********************************************************
-*FUNCTION: void InitA2D(uint8_t format, uint8_t acqtime)
-*PURPOSE: Initialize the analog to digital converter
-*PRECONDITION: A2D not initialized
-*POSTCONDITION: A2D is initialized
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void InitA2D(uint8_t format, uint8_t acqtime)
+ * --------------------
+ * Initialize the analog to digital converter
+ * 
+ * returns: Nothing
+ */
 void InitA2D(uint8_t format, uint8_t acqtime);
 
 /********************************************************
@@ -76,17 +69,30 @@ void InitA2D(uint8_t format, uint8_t acqtime);
             read the analog voltage value present at the pin
 *RETURN: Nothing
 ********************************************************/
+
+/*
+ * Function:  void EnableAnalogCh(uint8_t Chan);
+ * --------------------
+ * To enable a particular pin to read an analog voltage
+ * This will work best if ANCON0 and ANCON1 are first
+ * cleared such that all other pins will function as 
+ * digital I/O.
+ * After calling this function and passing in parameter
+ * "Chan" it is then possible to read an analog voltage 
+ * at pin "Chan".  
+ * 
+ * returns: Nothing
+ */
 void EnableAnalogCh(uint8_t Chan);
 
-/********************************************************
-*FUNCTION: void AnRefSel(uint8_t PosRef, uint8_t NegRef)
-*PURPOSE: Allows the user a quick way to set up the references
-        for the module.  Need to define both the positive and
-        negative references.
-*PRECONDITION: A2D references could be at default
-*POSTCONDITION: A2D references now defined
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void AnalogRefSel(uint8_t PosRef, uint8_t NegRef);
+ * --------------------
+ * Configures the positive and negative reference for the 
+ * A2D.  See function to understand what the options are
+ * 
+ * returns: Nothing
+ */
 void AnalogRefSel(uint8_t PosRef, uint8_t NegRef);
 
 #endif

@@ -5,12 +5,6 @@
 *           much of this informaiton was borrowed from the radio head library
 *           which can be found here https://github.com/LowPowerLab/RFM69 
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:

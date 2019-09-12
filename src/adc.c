@@ -4,12 +4,6 @@
 *   PURPOSE: Contains the routines that will read from the MCU's internal
 *           ADC.
 *
-*   DEVICE: PIC18LF6620
-*
-*   COMPILER: Microchip XC8 v1.10
-*
-*   IDE: MPLAB X v1.60
-*
 *   TODO:
 *   
 *   NOTE:
@@ -91,44 +85,6 @@ void InitA2D(uint8_t format, uint8_t acqtime) {
             break;
             
     }
-
-    // switch (prescaler) {   //TODO remove this extra junk
-    //     case 2:             //FRC divided by 2 for A2D clock
-    //         ADCS2 = 0;
-    //         ADCS1 = 0;
-    //         ADCS0 = 0;
-    //         break;
-    //     case 4:             //FRC divided by 4 for A2D clock
-    //         ADCS2 = 1;
-    //         ADCS1 = 0;
-    //         ADCS0 = 0;
-    //         break;
-    //     case 8:             //FRC divided by 8 for A2D clock
-    //         ADCS2 = 0;
-    //         ADCS1 = 0;
-    //         ADCS0 = 1;
-    //         break;
-    //     case 16:            //FRC divided by 16 for A2D clock
-    //         ADCS2 = 1;
-    //         ADCS1 = 0;
-    //         ADCS0 = 1;
-    //         break;
-    //     case 32:            //FRC divided by 32 for A2D clock
-    //         ADCS2 = 0;
-    //         ADCS1 = 1;
-    //         ADCS0 = 0;
-    //         break;
-    //     case 64:            //FRC divided by 64 for A2D clock
-    //         ADCS2 = 1;
-    //         ADCS1 = 1;
-    //         ADCS0 = 0;
-    //         break;
-    //     default:            //FRC is dedicated RC oscillator
-    //         ADCS2 = 0;
-    //         ADCS1 = 1;
-    //         ADCS0 = 1;
-    //         break;
-    // };
 
 }
 

@@ -4,12 +4,6 @@
 *   PURPOSE: Interrupt service routines are contained in this file.  This file contains
 *           algorithms that pertain to the interrupt service routine.
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:
@@ -136,9 +130,6 @@ __interrupt (low_priority) void main_isr( void ) {
 
     if(INT1IF){
         INTCON3bits.INT1IF = 0;     //Clear the interrupt flag
-        // if(RB1 == 1){         //TODO remove this junk
-        //     gblinfo.wakeedge = true;
-        // }
     }
     
     // if(INTCON3bits.INT2IF){
@@ -150,22 +141,6 @@ __interrupt (low_priority) void main_isr( void ) {
     // }
     
 } /* END void interrupt low_priority main_isr( void ) */
-
-// void Events20ms(void) {                 
-// }
-
-// void Events100ms(void) {                
-    
-// }
-
-// void Events500ms(void) {                
-    
-// }
-
-// void Events1000ms(void) {
-    
-// }
-
 
 void DisableInterrupts( void ) {
     GIEH = 0;           //Disable high priority interrupts

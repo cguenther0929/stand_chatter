@@ -4,12 +4,6 @@
 *   PURPOSE: Configuration file specific to the processor being used and the 
 *           underlying hardware. 
 *
-*   DEVICE: PPIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:

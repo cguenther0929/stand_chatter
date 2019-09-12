@@ -3,12 +3,6 @@
 *
 *   PURPOSE: Header file for main.c
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:
@@ -46,64 +40,74 @@
 #define DISP_TMR_ENABLE     2
 #define DISP_TMR_DISABLE    3
 
-/********************************************************
-*FUNCTION: void tick100msDelay( uint16_t ticks )
-*PURPOSE: Much more accurate timer that works off interrupts
-            User must define how many 1/10s of a tick1000mond he/she
-            wishes to pass
-*PRECONDITION: Timers must be set up and running in order for this to work
-*POSTCONDITION: tick100ms * 1/10s of a tick1000mond have passed.
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void tick100msDelay( uint16_t ticks );
+ * --------------------
+ * Blocking delay function.  Blocks in increments 
+ * of 100ms chunks.  Number of "chunks" depends on 
+ * "ticks" value passed to function.  This timing 
+ * routine is fairly accurate as it uses a timer
+ * w/ interrupts to count.  Timebase must first
+ * be configured via SetUp function.    
+ *
+ * returns: Nothing 
+ */
 void tick100msDelay( uint16_t ticks );
 
-/********************************************************
-*FUNCTION: void tick20msDelay( uint16_t ticks )
-*PURPOSE: Much more accurate timer that works off interrupts
-            User passes in how many 20ms chunks he/she wishes to pass 
-*PRECONDITION: Timer0 set up and running and set to interrupt
-*POSTCONDITION: Blocking delay inserted
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void tick20msDelay( uint16_t ticks );
+ * --------------------
+ * Blocking delay function.  Blocks in increments 
+ * of 20ms chunks.  Number of "chunks" depends on 
+ * "ticks" value passed to function.  This timing 
+ * routine is fairly accurate as it uses a timer
+ * w/ interrupts to count.  Timebase must first
+ * be configured via SetUp function.    
+ *
+ * returns: Nothing 
+ */
 void tick20msDelay( uint16_t ticks );
 
-
-/********************************************************
-*FUNCTION: void SetUp( void );
-*PURPOSE: Set up the PIC I/O and etc...
-*PRECONDITION: PIC not configured
-*POSTCONDITION: PIC I/O Configured
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void SetUp( void );
+ * --------------------
+ * SetUp routine covering all aspects of the application. 
+ * Processor GPIOs are configured.  Peripherials are 
+ * configured.  ADC is configured.  System timebase 
+ * and general timing parameters are configured.  
+ *
+ * returns: Nothing 
+ */
 void SetUp( void );
 
-/********************************************************
-*FUNCTION: float GetBatteryVoltage ( void )
-*PURPOSE: Retreive batter voltage
-*PRECONDITION: ADC must be configured.  
-*POSTCONDITION: Battery voltage measured
-*RETURN: Float value of battery voltage
-********************************************************/
+/*
+ * Function:  float GetBatteryVoltage ( void );
+ * --------------------
+ * Retrieve batter voltage.  ADC must first be fully
+ * configred/initialized.   
+ *
+ * returns: Battery Voltage as float
+ */
 float GetBatteryVoltage ( void );   
 
-/********************************************************
-*FUNCTION: void EvaluateState(  char pre_loaded_message[][16])
-*PURPOSE: Evaluate FSM
-*PRECONDITION: pre loaded messages array must be configured.  
-            struct containing receiver buffer shall be configured.
-*POSTCONDITION: FSM analyzed
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void EvaluateState(  char pre_loaded_message[][16]);
+ * --------------------
+ * Evaluate current state and whethere or not the FSM 
+ * shall advanced.  Pass in the n x 16 multi-dimensional 
+ * array that contains pre-loaded messages 
+ *
+ * returns: Nothing
+ */
 void EvaluateState(  char pre_loaded_message[][16]);
 
-/********************************************************
-*FUNCTION: void EvaluateButtonInputs ( void )
-*PURPOSE: Evaluate whethere or not a button has been pushed
-*PRECONDITION: GPIO for buttons must me configured.  Timebase
-            shall be configured and running.  
-*POSTCONDITION: Button pushes analyzed
-*RETURN: Nothing
-********************************************************/
+/*
+ * Function:  void EvaluateButtonInputs ( void )
+ * --------------------
+ * Evaluate whethere or not a button has been pushed
+ *
+ * returns: Nothing
+ */
 void EvaluateButtonInputs ( void ); 
 
 /*
@@ -115,7 +119,7 @@ void EvaluateButtonInputs ( void );
  *
  * returns: Nothing
  */
-void DisplayDwellTmr( uint8_t action);  // TODO need to comment
+void DisplayDwellTmr( uint8_t action);  
 
 /*
  * Function:  void PrintSplashScreen( void )
@@ -126,6 +130,6 @@ void DisplayDwellTmr( uint8_t action);  // TODO need to comment
  *
  * returns: Nothing
  */
-void PrintSplashScreen( void );     // TODO need to comment
+void PrintSplashScreen( void );     
 
 #endif

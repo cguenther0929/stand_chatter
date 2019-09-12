@@ -6,15 +6,12 @@
  *
  *	AUTHOR: Clinton Guenther
  *
- *	:TODO:	      
+ *	TODO:	      
  *
 ******************************************************************************/
 
 // #include "spi.h"		//Include the header file for this module
 #include "disp.h"
-
-/*  DEFINE THE STRUCTURE USED IN THIS FILE */
-// struct GlobalInformation sysinfo;
 
 void DispInit ( void ) {
     uint8_t i;

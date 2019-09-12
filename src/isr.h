@@ -3,12 +3,6 @@
 *
 *   PURPOSE: Header file for isr.c
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
 *   TODO:  
 *
 *   NOTE:

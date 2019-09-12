@@ -6,12 +6,11 @@
  *
  *	AUTHOR: Clinton Guenther
  *
- *	:TODO:	      
+ *	TODO:	      
  *
 ******************************************************************************/
 
 #include "spi.h"		//Include the header file for this module
-// #include "struct.h"               //Temporary.  Remove for final build
 
 /*  DEFINE THE STRUCTURE USED IN THIS FILE */
 struct GlobalInformation sysinfo;
@@ -127,7 +126,6 @@ uint8_t RFMSPI2Read(uint8_t addr) {
    
     while(BF2 != 1);                    // Wait until data is in the buffer (received)
     rcvd_data = SSP2BUF;                // BF2 is cleared by simply  reading received data from SSBUF
-    // for(i = 0; i<20 ; i++);          // Add a little delay  TODO can we remove this delay line?
 
     /* SEND GARBAGE TO GRAB THE DATA */
     SSP2BUF = 0x55;                     // Send the instruction
@@ -203,37 +201,4 @@ void DispSPI1Write(uint8_t data) {  // TODO need to test
     disp_spi_cs = 1;                    // Slave select low
 }
 
-uint8_t SPI1Read(uint8_t addr) { 
-    uint8_t i;                             //Use as a general variable
-    uint8_t data;        //Use this to read the received data (should be done)
-    
-    RFM_SPI_CS = 0;                         // Slave select low
-    for(i = 0; i < spidelay ; i++);         // Add a little delay
-
-    /* SEND THE ADDRESS */
-    WCOL1 = 0;
-    SSPOV1 = 0;
-    SSP1BUF = addr;                 // Send the instruction
-    while(BF1 != 1);                // Wait until data is in the buffer
-    data = SSP1BUF;                 // BF1 is cleared by simply  reading received data from SSBUF
-    for(i = 0; i<200 ; i++);        // Add a little delay
-
-    /* GRAB FIRST BYTE OF DATA */
-    WCOL1 = 0;
-    SSPOV1=0;
-    SSP1BUF = 0x55;                 // Transmit garbage to grab data
-    while(BF1 != 1);                // Wait until data is in the buffer
-    data = SSP1BUF;
-   
-    for(i = 0; i<spidelay ; i++);       // Add a little delay
-    RFM_SPI_CS = 1;                     // Diable the chip
-
-    return data;    //Return the 8bits of data
-
-}
-
-void SPIBurnDelay(void) {
-    uint8_t i;        //Used as a counter
-    for(i=0;i<255;i++);  //Add small delay
-}
 /* END OF FILE */

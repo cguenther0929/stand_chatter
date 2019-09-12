@@ -3,13 +3,7 @@
 *
 *   PURPOSE: Source file for RFM69HCW LoRa radio module 
 *
-*   DEVICE: PIC18F66K22
-*
-*   COMPILER: Microchip XC8 v1.32
-*
-*   IDE: MPLAB X v3.45
-*
-*   TODO:  TBD
+*   TODO: 
 *
 *   NOTE:
 *
