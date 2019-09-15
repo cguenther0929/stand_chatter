@@ -173,18 +173,23 @@ void PrintSplashScreen( void ) {
     DispSetContrast(60);
     DispWtLnOne("-----STAND------");
     DispWtLnTwo("-----CHATTER----");
-    tick100msDelay(2);
-    DispWriteString("FW v"); 
+    tick100msDelay(15);
+
+
+    DispRefresh();
+    DispWtLnOne("FW VERSION:");
+    DispLineTwo();
     DispWriteChar(MAJVER + 0x30); DispWriteChar('.');
     DispWriteChar(MINVER + 0x30); DispWriteChar('.');
     DispWriteChar(BUGVER + 0x30);
+    tick100msDelay(15);
     
+    DispRefresh();
     battery_voltage = GetBatteryVoltage();
-
     DispWtLnOne("BATTERY VOLTAGE: ");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
-    tick100msDelay(7);
+    tick100msDelay(15);
 
     DispWtLnOne("Waiting for");
     DispWtLnTwo("message");
@@ -199,7 +204,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
         temp_data = gblinfo.current_state;          // Can we maybe remove this one and the one further down and this still work?
         GetRxData();
         gblinfo.current_state = temp_data;  
-        if (gblinfo.current_state == STATE_IDLE_DISP) {
+        if (gblinfo.current_state == STATE_IDLE_DISP && rfm.valid_msg_received) {
             DisplayDwellTmr(DISP_TMR_RST);         // Send one to reset the counter
             DispWtLnOne("NEW MSG:");
             DispWtLnTwo(rfm.rxdata);
@@ -240,8 +245,15 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
             }
 
             if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
-                DispWtLnOne("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
+                
                 DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
                 disp_enable = DISPLAY_OFF;
             }
@@ -257,17 +269,21 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
             }
             
             else if(gblinfo.btn_both_pressed && (disp_enable == DISPLAY_ON)) {          
-                gblinfo.btn_lt_pressed       = false;
-                gblinfo.btn_rt_pressed       = false;
+                gblinfo.btn_lt_pressed      = false;
+                gblinfo.btn_rt_pressed      = false;
                 gblinfo.btn_both_pressed    = false;
                 DisplayDwellTmr(DISP_TMR_RST);         // Send one to reset the counter
 
                 // Transition to idle state and dispaly last received message
                 gblinfo.msg_to_send = 0;
-                DispSetContrast(60);
-                DispRefresh();
-                DispWriteString("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
                 
                 gblinfo.current_state = STATE_IDLE_DISP;
             }
@@ -297,8 +313,18 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
             }
             
             if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
-                DispWtLnOne("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
+                
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                    DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
+                    disp_enable = DISPLAY_OFF;
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
+                
                 DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
                 disp_enable = DISPLAY_OFF;
                 gblinfo.current_state = STATE_IDLE_DISP;
@@ -322,11 +348,16 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
 
                 // Transition to idle state and dispaly last received message
                 gblinfo.msg_to_send = 0;
-                DispSetContrast(60);
-                DispRefresh();
-                DispWriteString("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
-                
+
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
+
                 gblinfo.current_state = STATE_IDLE_DISP;
             }
             
@@ -352,8 +383,18 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
             
             if((gblinfo.disp_seconds_ctr >= MAX_DISP_DWELL) && (disp_enable == DISPLAY_ON)) {
                 gblinfo.msg_to_send = 0;
-                DispWtLnOne("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
+                
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                    DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
+                    disp_enable = DISPLAY_OFF;
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
+                
                 DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
                 disp_enable = DISPLAY_OFF;
                 gblinfo.current_state = STATE_IDLE_DISP;
@@ -366,9 +407,18 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
                 gblinfo.current_state = STATE_IDLE_DISP;
                 gblinfo.splash_screen_tmr_active = false;
                 gblinfo.msg_to_send = 0;
-                DispRefresh();
-                DispWriteString("LAST RECEIVED:");
-                DispWtLnTwo(rfm.rxdata);
+                
+                if(rfm.valid_msg_received){
+                    DispWtLnOne("LAST RECEIVED:");
+                    DispWtLnTwo(rfm.rxdata);
+                    DisplayDwellTmr(DISP_TMR_DISABLE);         // Send one to reset the counter
+                    disp_enable = DISPLAY_OFF;
+                }
+                else{
+                    DispWtLnOne("NO VALID MESSAGE");
+                    DispWtLnTwo("TO DISPLAY");
+                }
+                
             }
             
             break;
@@ -557,6 +607,9 @@ void SetUp(void)
     gblinfo.btn_lt_pressed              = false;
     gblinfo.btn_rt_pressed              = false;
     gblinfo.btn_both_pressed            = false;
+
+    /* RFM INITIALIZE */
+    rfm.valid_msg_received                    = false;
     
     /* INITIAL CONDITION OF HEALTH LED */
     health_led = LED_OFF;

@@ -31,8 +31,8 @@
 #define TMR0LOW             (uint8_t)(TMR0_TICKS-(256*(uint8_t)(TMR0_TICKS/256)))        // Module implementation to obtain register low value
 
 /* DEFINE CODE VERSION NUMBER */
-#define MAJVER                  0x00
-#define MINVER                  0x01
+#define MAJVER                  0x01
+#define MINVER                  0x00
 #define BUGVER                  0x00
 
 /* DEFINITIONS FOR MESSAGES */

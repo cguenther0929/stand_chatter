@@ -12,3 +12,5 @@ The source files are to be compiled using the XC 8 compiler **V2.00**.  The IDE 
 * V0.0.2 -- This code base has the radio successfully transmitting to a Feather M0 wireless module.  
 
 * V0.1.0 -- Transmitting and receiving messages per the intended FSM.  Could easily deploy this version on two communication modules.  
+
+* V1.0.0 -- Initial release.  Received messages are now subjected to a crude check in which message length is verified.  Code greatly cleaned up and well commented.  

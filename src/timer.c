@@ -161,21 +161,8 @@ void Timer1On(uint8_t RegHigh, uint8_t RegLow){
     T1CONbits.TMR1ON = 1;               // Set the bit to turn on the timer
 }
 
-void Timer1On16b(uint16_t CtrRegVal){
-    TMR1H = (uint8_t)((CtrRegVal >> 8) & 0x00FF);                   // Load eight bits of high byte
-    TMR1L = (uint8_t)(CtrRegVal & 0x00FF);                          // Load eight bits of low byte 
-    T1CONbits.TMR1ON = 1;               // Set the bit to turn on the timer
-}
-
 void Timer1Off( void ){
     TMR1ON = 0;                     //Turn the timer off
-}
-
-uint16_t Timer1CtrVal( void ){
-    uint16_t rtnval = 0x0000;
-    rtnval = TMR1L;
-    rtnval = (uint16_t)((TMR1H << 8) | rtnval);
-    return rtnval;
 }
 
 void Timer2On( uint8_t period ){
@@ -187,7 +174,7 @@ void Timer2Off( void ){
     TMR2ON = 0;                 	//Set the bit to turn on the timer
 }
 
-void Timer2Init( bool interrupts, uint8_t prescaler, uint8_t postscaler) {
+void Timer2Init( uint8_t interrupts, uint8_t prescaler, uint8_t postscaler) {  //TODO remove this function
     switch(interrupts){
         case 0:
             TMR2IE = 0;     //Do not cause an interrupt
@@ -223,7 +210,7 @@ void Timer2Init( bool interrupts, uint8_t prescaler, uint8_t postscaler) {
 
 }
 
-void Timer3Init( bool interrupts, uint8_t prescaler, bool clksource ) {
+void Timer3Init(uint8_t interrupts, uint8_t prescaler, uint8_t clksource ) {
 
     /* Some additional notes on this timer.  TXSYNC bit/functions are not supported here.  If such 
     features are desired, or this timer/counter operates from a source other than fosc/4, then code
@@ -296,7 +283,7 @@ void Timer3Off( void ){
     TMR3ON = 0;                     //Turn the timer off
 }
 
-void Timer4Init(  bool interrupts, uint8_t prescaler, uint8_t postscaler ) {
+void Timer4Init(  uint8_t interrupts, uint8_t prescaler, uint8_t postscaler ) {
 	    switch(interrupts){
         case 0:
             TMR4IE = 0;     //Do not cause an interrupt

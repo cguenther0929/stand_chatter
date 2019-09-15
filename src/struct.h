@@ -21,6 +21,8 @@
 
 extern struct RFM {
     uint8_t         rfmmode;                        // Keep track of the radio's mode
+    bool            valid_msg_received;                   // Flag set when first valid message received
+    uint8_t         rcvd_msg_len;                   // Read size of message received
     char            rxdata[16];                     // Receive buffer
 } RFM;
 

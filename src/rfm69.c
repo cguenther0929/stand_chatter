@@ -142,8 +142,18 @@ void GetRxData( void ) {
 
     RFMSPI2Write(RH_RF95_REG_0D_FIFO_ADDR_PTR, RFMSPI2Read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR));
     RFMSPI2ReadBurst(RFM_REG_00_FIFO, rfm.rxdata, len);
-	RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
-
+    RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
+    
+    rfm.rcvd_msg_len = GetMsgLen(rfm.rxdata);
+    
+    if(rfm.rcvd_msg_len <= 16) {
+        rfm.valid_msg_received = true;
+    }
+    else{
+        strcpy(rfm.rxdata,'\0');
+        rfm.valid_msg_received = false;
+    }
+    
     RFMsetMode(RFM_MODE_STANDBY);
 }
 
@@ -250,5 +260,16 @@ void RFMsetTxPower(int8_t power, bool useRFO) {
 	    // My measurements show 20dBm is correct
 	    RFMSPI2Write(RH_RF95_REG_09_PA_CONFIG, RH_RF95_PA_SELECT | (power-5));
     }
+}
+
+uint8_t GetMsgLen(const char * msg) {
+    uint8_t ctr     = 0;
+
+    while(*msg != '\0'){
+        ctr++;
+        msg++;                           //Increment the pointer memory address
+    }
+
+    return(ctr);
 }
 

@@ -117,6 +117,15 @@ bool RFMtxInProgress( void );
  */
 bool ReceivedPacket( void );  
 
+/*
+ * Function: uint8_t GetMsgLen(const char * msg);
+ * --------------------
+ * Determines the length of the received message
+ *
+ * returns: The length of the received message
+ */
+uint8_t GetMsgLen(const char * msg);
+
 // This is the address that indicates a broadcast
 #define RFM_BROADCAST_ADDRESS   0xff
 
