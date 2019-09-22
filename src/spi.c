@@ -180,14 +180,14 @@ void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len) {
     RFM_SPI_CS = 1;                     // Disable the chip
 }
 
-void DispSPI1Write(uint8_t data) {  // TODO need to test 
+void DispSPI1Write(uint8_t data) { 
 
     uint8_t i;                          // Use as a general variable
     uint8_t rcvd_data;            // Use this to read the received data (should be done)
 
     disp_spi_cs = 0;                    // Slave select low
     for(i = 0; i < spidelay ; i++);       // Add a little delay
-    rcvd_data = SSP1BUF;                // Read the buffer to assure it is emply and BF is cleared
+    rcvd_data = SSP1BUF;                // Read the buffer to assure it is empty and BF is cleared
 
     /* SEND DATA */
     WCOL1 = 0;

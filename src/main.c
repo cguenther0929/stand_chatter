@@ -94,9 +94,11 @@ void main()
     gblinfo.disp_tmr_active = true;             // Begin the timer to kill display after timeout
 
     uint8_t msg_order = 0;
-    char pre_loaded_message[NUM_MESSAGES][16];
+    char pre_loaded_message[NUM_MESSAGES][16];  // Don't forget to update NUM_MESSAGES if adding a message
+    strcpy(pre_loaded_message[msg_order++], "In the stand.");
+    strcpy(pre_loaded_message[msg_order++], "Cool, Good luck!"); 
     strcpy(pre_loaded_message[msg_order++], "Seeing anything?"); 
-    strcpy(pre_loaded_message[msg_order++], "I'm surrounded");   
+    strcpy(pre_loaded_message[msg_order++], "I'm surrounded!");   
     strcpy(pre_loaded_message[msg_order++], "Did you shoot?");   
     strcpy(pre_loaded_message[msg_order++], "Yes, I shot!");   
     strcpy(pre_loaded_message[msg_order++], "Need help, man?");  
@@ -107,7 +109,7 @@ void main()
     strcpy(pre_loaded_message[msg_order++], "On the way down."); 
     strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");   
     strcpy(pre_loaded_message[msg_order], "Ignore prev msg!");  
-    
+
     while (true) {
         if(gblinfo.flag20ms) {
             gblinfo.flag20ms = false;
@@ -182,14 +184,14 @@ void PrintSplashScreen( void ) {
     DispWriteChar(MAJVER + 0x30); DispWriteChar('.');
     DispWriteChar(MINVER + 0x30); DispWriteChar('.');
     DispWriteChar(BUGVER + 0x30);
-    tick100msDelay(15);
+    tick100msDelay(10);
     
     DispRefresh();
     battery_voltage = GetBatteryVoltage();
     DispWtLnOne("BATTERY VOLTAGE: ");
     DispLineTwo();
     DispWriteFloat(battery_voltage);
-    tick100msDelay(15);
+    tick100msDelay(10);
 
     DispWtLnOne("Waiting for");
     DispWtLnTwo("message");
@@ -293,7 +295,7 @@ void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
                 gblinfo.btn_rt_pressed       = false;
                 gblinfo.btn_both_pressed    = false;
                 DisplayDwellTmr(DISP_TMR_RST);         // Send one to reset the counter
-                
+                DispWtLnOne("SEND:");
                 (gblinfo.msg_to_send >= (NUM_MESSAGES-1))?(gblinfo.msg_to_send = 0):(gblinfo.msg_to_send++);
                 DispWtLnTwo(pre_loaded_message[gblinfo.msg_to_send]);
 

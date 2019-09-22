@@ -14,3 +14,5 @@ The source files are to be compiled using the XC 8 compiler **V2.00**.  The IDE 
 * V0.1.0 -- Transmitting and receiving messages per the intended FSM.  Could easily deploy this version on two communication modules.  
 
 * V1.0.0 -- Initial release.  Received messages are now subjected to a crude check in which message length is verified.  Code greatly cleaned up and well commented.  
+
+* V1.1.0 -- Fixed bug in which a message having a length of 16 characters would register as a message with a length of 21.  Added a few messages to the lineup.  Performed a bit of testing now that there are two modules.          

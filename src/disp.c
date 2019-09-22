@@ -126,7 +126,7 @@ void DispWtLnOne ( const char * y ) {
     uint8_t char_ctr = 0;
     DispLineOne();
 
-    while(*y != '\0'){
+    while(*y != '\0' && char_ctr < 16){
         DispWriteChar(*y);
         y++;                           //Increment the pointer memory address
         char_ctr++;
@@ -143,7 +143,7 @@ void DispWtLnTwo ( const char * y ) {
     uint8_t char_ctr = 0;
     DispLineTwo();
 
-    while(*y != '\0'){
+    while(*y != '\0' && char_ctr < 16){       
         DispWriteChar(*y);
         y++;                           //Increment the pointer memory address
         char_ctr++;

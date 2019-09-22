@@ -70,6 +70,7 @@ bool RFMsend(const char * data, uint8_t len)
 {
     uint16_t i = 0;
     uint8_t temp_data;
+    uint8_t *temp_ptr;
 
     
     if (len > RFM_MAX_MESSAGE_LEN) {
@@ -103,7 +104,6 @@ bool RFMsend(const char * data, uint8_t len)
     RFMSPI2Write(RFM_REG_00_FIFO, 0x00);                        // Header ID
     RFMSPI2Write(RFM_REG_00_FIFO, 0x00);                        // Header flags
     
-    // The message data
     RFMSPI2WriteBurst(RFM_REG_00_FIFO, data, len);
     
     RFMSPI2Write(RH_RF95_REG_22_TX_PALD_LG, len + RFM_HEADER_LEN);
@@ -145,8 +145,8 @@ void GetRxData( void ) {
     RFMSPI2Write(RH_RF95_REG_12_IRQ_FLAGS, 0xFF); // Clear all IRQ flags
     
     rfm.rcvd_msg_len = GetMsgLen(rfm.rxdata);
-    
-    if(rfm.rcvd_msg_len <= 16) {
+
+    if(rfm.rcvd_msg_len <= 21) {
         rfm.valid_msg_received = true;
     }
     else{
@@ -205,7 +205,7 @@ void RFMsetMode(uint8_t mode) {
 
 bool RFMsetFrequency (float centre) {       
     
-    uint32_t frf = (centre * 1000000.0) / RH_RF95_FSTEP;          // TODO can clean this up by replacing 61.** with RH_RF95_FSTEP
+    uint32_t frf = (centre * 1000000.0) / RH_RF95_FSTEP;          
     RFMSPI2Write(RH_RF95_REG_06_FRF_MSB, (frf >> 16) & 0xff);
     RFMSPI2Write(RH_RF95_REG_07_FRF_MID, (frf >> 8) & 0xff);
     RFMSPI2Write(RH_RF95_REG_08_FRF_LSB, frf & 0xff);
@@ -263,9 +263,9 @@ void RFMsetTxPower(int8_t power, bool useRFO) {
 }
 
 uint8_t GetMsgLen(const char * msg) {
-    uint8_t ctr     = 0;
+    uint8_t ctr     = 1;  // Don't want this to be zero-based
 
-    while(*msg != '\0'){
+    while(*msg != '.' && *msg != '!' && *msg != '?'){
         ctr++;
         msg++;                           //Increment the pointer memory address
     }

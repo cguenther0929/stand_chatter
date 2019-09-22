@@ -174,7 +174,7 @@ void Timer2Off( void ){
     TMR2ON = 0;                 	//Set the bit to turn on the timer
 }
 
-void Timer2Init( uint8_t interrupts, uint8_t prescaler, uint8_t postscaler) {  //TODO remove this function
+void Timer2Init( uint8_t interrupts, uint8_t prescaler, uint8_t postscaler) {  
     switch(interrupts){
         case 0:
             TMR2IE = 0;     //Do not cause an interrupt
