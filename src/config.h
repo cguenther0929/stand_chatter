@@ -32,11 +32,11 @@
 
 /* DEFINE CODE VERSION NUMBER */
 #define MAJVER                  0x01
-#define MINVER                  0x01
+#define MINVER                  0x02
 #define BUGVER                  0x00
 
 /* DEFINITIONS FOR MESSAGES */
-#define NUM_MESSAGES            14
+#define NUM_MESSAGES            15
 
 /* DEFINITIONS RELATED TO DISPLAY */
 #define MAX_DISP_DWELL          5                           // Max amount of time (in seconds) display is allowed to be ON

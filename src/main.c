@@ -96,19 +96,20 @@ void main()
     uint8_t msg_order = 0;
     char pre_loaded_message[NUM_MESSAGES][16];  // Don't forget to update NUM_MESSAGES if adding a message
     strcpy(pre_loaded_message[msg_order++], "In the stand.");
-    strcpy(pre_loaded_message[msg_order++], "Cool, Good luck!"); 
     strcpy(pre_loaded_message[msg_order++], "Seeing anything?"); 
     strcpy(pre_loaded_message[msg_order++], "I'm surrounded!");   
     strcpy(pre_loaded_message[msg_order++], "Did you shoot?");   
-    strcpy(pre_loaded_message[msg_order++], "Yes, I shot!");   
     strcpy(pre_loaded_message[msg_order++], "Need help, man?");  
-    strcpy(pre_loaded_message[msg_order++], "Yes, please.");  
-    strcpy(pre_loaded_message[msg_order++], "No, thank you.");  
     strcpy(pre_loaded_message[msg_order++], "Just bagged one!"); 
-    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");   
     strcpy(pre_loaded_message[msg_order++], "On the way down."); 
+    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");   
+    strcpy(pre_loaded_message[msg_order++], "Yes, I shot!");   
+    strcpy(pre_loaded_message[msg_order++], "OK, sounds good.");   
+    strcpy(pre_loaded_message[msg_order++], "OK, me too.");   
+    strcpy(pre_loaded_message[msg_order++], "Yes, sir.");  
+    strcpy(pre_loaded_message[msg_order++], "No, sir.");  
     strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");   
-    strcpy(pre_loaded_message[msg_order], "Ignore prev msg!");  
+    strcpy(pre_loaded_message[msg_order],   "Ignore prev msg!");  
 
     while (true) {
         if(gblinfo.flag20ms) {
