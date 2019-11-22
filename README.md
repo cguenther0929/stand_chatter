@@ -1,6 +1,6 @@
-# BLDC Motor Controller #
+# Stand Chatter #
 
-This repository contains source files for the stand chatter project.  This device operates like a simple texting device allowing for written communication between parties that posses a device.  
+This repository contains source files for the stand chatter project.  This device operates like a simple texting device allowing for written communication between parties that posses a device.  Communication hinges on the RMF 69 LoRA radio module.    
 
 ### TOOL SUITE ###
 
