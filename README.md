@@ -18,3 +18,5 @@ The source files are to be compiled using the XC 8 compiler **V2.00**.  The IDE 
 * V1.1.0 -- Fixed bug in which a message having a length of 16 characters would register as a message with a length of 21.  Added a few messages to the lineup.  Performed a bit of testing now that there are two modules.     
 
 * V1.2.0 -- Simply added/modified messages just prior to opening day.       
+
+* V1.3.0 -- The method for storing pre-loaded messages has been modified.  Memory wasn't being properly allocated previously, but now things seem much more stable (no more Chinese characters).  Array size changed to 17 characters (16 char + null).  Increased the over current limit by adjusting the OcpTrim config register within the RFM69 radio module.  If using maximum power, the current limit must be increased! No additions/modification to messages themselves.  
