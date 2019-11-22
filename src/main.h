@@ -3,13 +3,15 @@
 *
 *   PURPOSE: Header file for main.c
 *
-*   TODO:  
+*   TODO: Determine why ARRAY_LENGTH cannot be used when defining 
+*           EvaluateState.  The number 17 shall be typed, or else 
+*           compile errors are present.
 *
 *   NOTE:
 *
 ******************************************************************************/
-#ifndef __MAIN_H_
-#define __MAIN_H_
+#ifndef __MAIN_H
+#define __MAIN_H
 
 #include <xc.h>         //Part specific header file
 #include <stdint.h>
@@ -91,7 +93,7 @@ void SetUp( void );
 float GetBatteryVoltage ( void );   
 
 /*
- * Function:  void EvaluateState(  char pre_loaded_message[][16]);
+ * Function:  void EvaluateState( const char pre_loaded_message[][ARRAY_LENGTH]);
  * --------------------
  * Evaluate current state and whethere or not the FSM 
  * shall advanced.  Pass in the n x 16 multi-dimensional 
@@ -99,7 +101,7 @@ float GetBatteryVoltage ( void );
  *
  * returns: Nothing
  */
-void EvaluateState(  char pre_loaded_message[][16]);
+void EvaluateState( const char pre_loaded_message[][17]);
 
 /*
  * Function:  void EvaluateButtonInputs ( void )

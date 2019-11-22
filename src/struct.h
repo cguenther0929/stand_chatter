@@ -9,8 +9,8 @@
 *
 ******************************************************************************/
 
-#ifndef __STRUCT_H_
-#define __STRUCT_H_
+#ifndef __STRUCT_H
+#define __STRUCT_H
 
 #include <xc.h>
 #include <stdint.h>

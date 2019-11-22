@@ -3,7 +3,7 @@
 *
 *   PURPOSE: Source file for RFM69HCW LoRa radio module 
 *
-*   TODO: 
+*   TODO: Really need to harden mechanism that sets valid_msg_received
 *
 *   NOTE:
 *
@@ -146,6 +146,8 @@ void GetRxData( void ) {
     
     rfm.rcvd_msg_len = GetMsgLen(rfm.rxdata);
 
+
+
     if(rfm.rcvd_msg_len <= 21) {
         rfm.valid_msg_received = true;
     }
@@ -224,7 +226,14 @@ bool RFMtxInProgress( void ) {
 }
 
 void RFMsetTxPower(int8_t power, bool useRFO) {         
-    // Sigh, different behaviours depending on whther the module use PA_BOOST or the RFO pin
+    
+    // The Over Current Protection (OCP) feature is enabled by default
+    // so no need to enable it here.  However, the current limit must be 
+    // set high enough so as to not limit the power amplifiers when transmitting.
+    // The following operation will set the current limit to maximum
+    RFMSPI2Write(RH_RF95_REG_0B_OCP, RH_RF95_OCP_HI);
+    
+    // Sigh, different behaviors depending on whther the module use PA_BOOST or the RFO pin
     // for the transmitter output
     if (useRFO) {
 	    if (power > 14)
@@ -239,11 +248,14 @@ void RFMsetTxPower(int8_t power, bool useRFO) {
 	    if (power < 5)
 	        power = 5;
 
-	    // For RH_RF95_PA_DAC_ENABLE, manual says '+20dBm on PA_BOOST when OutputPower=0xf'
-	    // RH_RF95_PA_DAC_ENABLE actually adds about 3dBm to all power levels. We will us it
-	    // for 21, 22 and 23dBm
+	    // For RH_RF95_PA_DAC_ENABLE, manual says '+20dBm on PA_BOOST when OutputPower 4'b1111
+	    // RH_RF95_PA_DAC_ENABLE actually adds about 3dBm to all power levels. The DAC will be 
+        // used for power levels 21, 22 and 23dBm
 	    if (power > 20)
 	    {
+            // The following operation enables the DAC for +20dBm operation
+            // This is accomplished by loading 0x07 into the DAC register (addr 0x4D)
+            // for more information, see page 99 of the datasheet
 	        RFMSPI2Write(RH_RF95_REG_4D_PA_DAC, RH_RF95_PA_DAC_ENABLE);
 	        power -= 3;
 	    }
@@ -254,18 +266,21 @@ void RFMsetTxPower(int8_t power, bool useRFO) {
 
 	    // RFM95/96/97/98 does not have RFO pins connected to anything. Only PA_BOOST
 	    // pin is connected, so must use PA_BOOST
-	    // Pout = 2 + OutputPower.
-	    // The documentation is pretty confusing on this topic: PaSelect says the max power is 20dBm,
-	    // but OutputPower claims it would be 17dBm.
-	    // My measurements show 20dBm is correct
-	    RFMSPI2Write(RH_RF95_REG_09_PA_CONFIG, RH_RF95_PA_SELECT | (power-5));
+        //                  1 = PaSelect for +20dBm            
+        //                   |  (Pmax - 10.8)/0.6 ... Doesn't really jive, so set to max val
+        //                   |  |   Output Power Setting ... w/ PaSelect, Pout = 17 - (15 - Output Power) 
+        //                   |  |   |
+        // Register Setting: 1_111_1111
+        // Details regarding register RegPAConfig can be found on p88 of the datasheet
+	    RFMSPI2Write(RH_RF95_REG_09_PA_CONFIG, 0xFF); 
+	    // RFMSPI2Write(RH_RF95_REG_09_PA_CONFIG, RH_RF95_PA_SELECT | (power-5));  //TODO can remove this line after verifying previous line
     }
 }
 
 uint8_t GetMsgLen(const char * msg) {
     uint8_t ctr     = 1;  // Don't want this to be zero-based
 
-    while(*msg != '.' && *msg != '!' && *msg != '?'){
+    while(*msg != '.' && *msg != '!' && *msg != '?' && *msg != '\0'){
         ctr++;
         msg++;                           //Increment the pointer memory address
     }

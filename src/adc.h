@@ -59,17 +59,6 @@ uint16_t ReadA2D( uint8_t CHAN, bool FILTER );
  */
 void InitA2D(uint8_t format, uint8_t acqtime);
 
-/********************************************************
-*FUNCTION: EnableAnalogCh
-*PURPOSE: To enable a particular pin to read an analog voltage
-*PRECONDITION: This will work best if ANCON0 and ANCON1 are first
-            cleared such that all other pins will function as 
-            digital I/O
-*POSTCONDITION: Analog channel defined by "Chan" will now
-            read the analog voltage value present at the pin
-*RETURN: Nothing
-********************************************************/
-
 /*
  * Function:  void EnableAnalogCh(uint8_t Chan);
  * --------------------
@@ -78,7 +67,7 @@ void InitA2D(uint8_t format, uint8_t acqtime);
  * cleared such that all other pins will function as 
  * digital I/O.
  * After calling this function and passing in parameter
- * "Chan" it is then possible to read an analog voltage 
+ * "Chan", it is then possible to read an analog voltage 
  * at pin "Chan".  
  * 
  * returns: Nothing

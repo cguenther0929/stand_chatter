@@ -10,8 +10,8 @@
 *
 ******************************************************************************/
 
-#ifndef __SPI_H_
-#define __SPI_H_
+#ifndef __SPI_H
+#define __SPI_H
 
 #include <xc.h>         //Part specific header file
 #include <stdint.h>
@@ -66,14 +66,14 @@ void RFMSPI2Write(uint8_t addr, uint8_t data);
 void RFMSPI2WriteBurst(uint8_t addr, const char * data, uint8_t len);
 
 /*
- * Function: void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len)
+ * Function: void RFMSPI2ReadBurst(uint8_t addr, char * data, uint8_t len)
  * --------------------
  * Read multiple bytes of data starting at the deinfed address.  
  * The number of byes to be read is defined by the len parameter.  
  * 
  * returns: Nothing
  */
-void RFMSPI2ReadBurst(uint8_t addr, uint8_t * data, uint8_t len);
+void RFMSPI2ReadBurst(uint8_t addr, char * data, uint8_t len);
 
 /*
  * Function: uint8_t RFMSPI2Read(uint8_t addr)

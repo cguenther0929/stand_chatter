@@ -122,7 +122,7 @@ void DispWriteChar (uint8_t c) {
     
 }
 
-void DispWtLnOne ( const char * y ) {
+void DispWtLnOne ( char * y ) {
     uint8_t char_ctr = 0;
     DispLineOne();
 
@@ -139,7 +139,7 @@ void DispWtLnOne ( const char * y ) {
 
 }
 
-void DispWtLnTwo ( const char * y ) {
+void DispWtLnTwo ( char * y ) {
     uint8_t char_ctr = 0;
     DispLineTwo();
 

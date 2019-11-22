@@ -37,7 +37,7 @@ void Timer0Init(uint8_t interrupts, uint16_t prescaler, uint8_t clksource );
 void Timer0On( void );
 
 /*
- * Function: void Timer0On( void )
+ * Function: void Timer1Init( uint8_t interrupts, uint8_t prescaler, uint8_t clksource )
  * --------------------
  * Timer 1 is initialized When reading from timer one 
  * in 16bit mode, we must read from the LOW byte first. 

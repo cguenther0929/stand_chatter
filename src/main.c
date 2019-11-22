@@ -94,22 +94,23 @@ void main()
     gblinfo.disp_tmr_active = true;             // Begin the timer to kill display after timeout
 
     uint8_t msg_order = 0;
-    char pre_loaded_message[NUM_MESSAGES][16];  // Don't forget to update NUM_MESSAGES if adding a message
-    strcpy(pre_loaded_message[msg_order++], "In the stand.");
-    strcpy(pre_loaded_message[msg_order++], "Seeing anything?"); 
-    strcpy(pre_loaded_message[msg_order++], "I'm surrounded!");   
-    strcpy(pre_loaded_message[msg_order++], "Did you shoot?");   
-    strcpy(pre_loaded_message[msg_order++], "Need help, man?");  
-    strcpy(pre_loaded_message[msg_order++], "Just bagged one!"); 
-    strcpy(pre_loaded_message[msg_order++], "On the way down."); 
-    strcpy(pre_loaded_message[msg_order++], "Leaving in 10.");   
-    strcpy(pre_loaded_message[msg_order++], "Yes, I shot!");   
-    strcpy(pre_loaded_message[msg_order++], "OK, sounds good.");   
-    strcpy(pre_loaded_message[msg_order++], "OK, me too.");   
-    strcpy(pre_loaded_message[msg_order++], "Yes, sir.");  
-    strcpy(pre_loaded_message[msg_order++], "No, sir.");  
-    strcpy(pre_loaded_message[msg_order++], "Fell and hurt!");   
-    strcpy(pre_loaded_message[msg_order],   "Ignore prev msg!");  
+    const char pre_loaded_message [NUM_MESSAGES][ARRAY_LENGTH] = {
+        "In the stand.",
+        "Seeing anything?",
+        "I'm surrounded!",
+        "Did you shoot?",
+        "Need help, man?",
+        "Just bagged one.",
+        "On the way down.",
+        "Leaving in 10.",
+        "Yes, I shot!",
+        "OK, sounds good.",
+        "OK, me too.",
+        "Yes, sir.",
+        "No, sir.",
+        "Fell and hurt!",
+        "Ignore prev msg!"
+    };
 
     while (true) {
         if(gblinfo.flag20ms) {
@@ -199,9 +200,8 @@ void PrintSplashScreen( void ) {
 
 }
 
-void EvaluateState( char pre_loaded_message[NUM_MESSAGES][16]) {
+void EvaluateState( const char pre_loaded_message[NUM_MESSAGES][ARRAY_LENGTH]) {
     uint8_t temp_data;
-    //extern CURRENTSTATE state;
 
     if(ReceivedPacket()) {
         temp_data = gblinfo.current_state;          // Can we maybe remove this one and the one further down and this still work?

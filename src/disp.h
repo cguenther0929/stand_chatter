@@ -10,8 +10,8 @@
 *
 ******************************************************************************/
 
-#ifndef __DISP_H_
-#define __DISP_H_
+#ifndef __DISP_H
+#define __DISP_H
 
 #include <xc.h>         //Part specific header file
 #include <stdint.h>
@@ -76,7 +76,7 @@ void DispWriteChar (uint8_t c);
 void DispWriteString(char * y);
 
 /*
- * Function: void DispWtLnOne ( const char * y )
+ * Function: void DispWtLnOne ( char * y )
  * --------------------
  * Write to the first line of the display.  
  * Cursor will automatically be placed at the 
@@ -89,10 +89,10 @@ void DispWriteString(char * y);
  *
  * returns: Nothing
  */
-void DispWtLnOne ( const char * y );
+void DispWtLnOne ( char * y );
 
 /*
- * Function: void DispWtLnTwo ( const char * y )
+ * Function: void DispWtLnTwo ( char * y )
  * --------------------
  * Write to the second line of the display.  
  * Cursor will automatically be placed at the 
@@ -105,7 +105,7 @@ void DispWtLnOne ( const char * y );
  *
  * returns: Nothing
  */
-void DispWtLnTwo ( const char * y );
+void DispWtLnTwo ( char * y );
 
 /*
  * Function: void DispLineTwo (void )

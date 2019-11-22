@@ -9,12 +9,13 @@
 *   NOTE:
 *
 ******************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef __CONFIG_H
+#define __CONFIG_H
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <xc.h>
+#include "main.h"
 #include "struct.h"
 
 /* PREPROCESSOR CALCULATION TO DETERMINE TIMER4'S INCREMENT RATE */
@@ -32,11 +33,12 @@
 
 /* DEFINE CODE VERSION NUMBER */
 #define MAJVER                  0x01
-#define MINVER                  0x02
+#define MINVER                  0x03
 #define BUGVER                  0x00
 
 /* DEFINITIONS FOR MESSAGES */
 #define NUM_MESSAGES            15
+#define ARRAY_LENGTH            17
 
 /* DEFINITIONS RELATED TO DISPLAY */
 #define MAX_DISP_DWELL          5                           // Max amount of time (in seconds) display is allowed to be ON
